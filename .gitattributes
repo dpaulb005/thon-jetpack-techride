@@ -1,0 +1,7 @@
+# keep Unix line endings everywhere: the Makefile and build scripts need them
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.JPG binary
+*.MOV binary
+*.ttf binary

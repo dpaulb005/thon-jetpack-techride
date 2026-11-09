@@ -1,0 +1,24 @@
+# build output (regenerate with `make web` / `make exe`)
+/build/
+/dist/
+/web/
+/out/*.o
+/out/*.wasm.o
+
+# not ours to share: original game art copied by the student project
+/old_assets/
+
+# the website prototype ZIP is already built into tools/shell.html
+/THON_TECHRIDE_HTML_SITE.zip
+
+# local saves and OS clutter
+achievements.txt
+best_distance.txt
+leaderboard.txt
+character.txt
+cosmetic.txt
+background.txt
+difficulty.txt
+.DS_Store
+__pycache__/
+playtest-output/

@@ -1,0 +1,10 @@
+# Body rockets: one sprite file per line; each launch picks one at random.
+# Add more with: python3 tools/make_rockets.py PHOTO
+body_01.png
+body_02.png
+body_03.png
+body_04.png
+body_05.png
+body_06.png
+body_07.png
+body_08.png

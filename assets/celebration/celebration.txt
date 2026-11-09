@@ -1,0 +1,3 @@
+# Number of frames (00.png, 01.png, ...) in the NEW BEST! animation.
+# Regenerate with: python3 tools/make_character.py VIDEO --celebration
+15
