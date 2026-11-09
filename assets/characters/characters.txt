@@ -1,0 +1,10 @@
+# THON TECHride characters, in Settings order (first = default for new players)
+#   Name|sprite.png               a single photo sprite in this folder
+#   Name|folder/|frame_count      a photo/video animation (00.png, 01.png, ...)
+#   Name|@prefix                  an animated set from assets/techride/manifest.txt
+#                                 (prefix.run, prefix.fly, prefix.idle, prefix.land, ...)
+# Add photo characters with tools/make_character.py
+TECHBOT|@techbot
+Nittany Lion|@lion
+Real TECH Robot|robot.png
+Real Nittany Lion|nittany_lion.png
