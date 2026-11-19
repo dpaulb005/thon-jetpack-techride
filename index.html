@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#050814">
+  <meta name="description" content="Jetpack TECHride — TECHBOT, one jetpack, 46 hours and zero chairs. Dodge live cables, drones, merch missiles and the laser show, and collect donations.">
+  <title>Jetpack TECHride</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23080d1f'/%3E%3Crect x='12' y='14' width='40' height='34' rx='11' fill='%23a6e22e'/%3E%3Crect x='19' y='22' width='27' height='17' rx='7' fill='%230a1230'/%3E%3Crect x='25' y='26' width='5' height='9' rx='2' fill='%234aa8ff'/%3E%3Crect x='35' y='26' width='5' height='9' rx='2' fill='%234aa8ff'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="rotate"><div><b>↻</b>Turn your device sideways to play</div></div>
+<div id="app">
+  <div id="stage">
+    <canvas id="game" aria-label="Jetpack TECHride game"></canvas>
+
+    <div id="ui">
+      <!-- ===== in-run HUD ===== -->
+      <div id="hud" class="hidden">
+        <div class="hud-left">
+          <div class="hud-dist"><span id="hud-dist">0</span><small>m</small></div>
+          <div class="hud-row">
+            <div class="chip" id="hud-coins-chip"><canvas class="coin-ico" width="44" height="44"></canvas><span id="hud-coins">0</span></div>
+            <div class="chip chip-ghost">BEST <span id="hud-best">0</span> m</div>
+            <div class="chip chip-hour" id="hud-hour">HOUR 0 / 46</div>
+          </div>
+        </div>
+        <div id="hud-tech" aria-label="Collect the letters T, E, C and H to call in The F-150">
+          <b>T</b><b>E</b><b>C</b><b>H</b><span>▸</span><canvas data-icon="truck" width="60" height="60"></canvas>
+        </div>
+        <div id="hud-powers">
+          <div class="pill hidden" data-power="ride"><canvas width="44" height="44"></canvas><div class="pill-body"><b>RIDE</b><i><u></u></i></div></div>
+          <div class="pill hidden" data-power="shield"><canvas width="44" height="44"></canvas><div class="pill-body"><b>MORALER SHIELD</b><i><u></u></i></div></div>
+          <div class="pill hidden" data-power="magnet"><canvas width="44" height="44"></canvas><div class="pill-body"><b>CANNING MAGNET</b><i><u></u></i></div></div>
+          <div class="pill hidden" data-power="rush"><canvas width="44" height="44"></canvas><div class="pill-body"><b>DONOR MATCH ×2</b><i><u></u></i></div></div>
+          <div class="pill hidden" data-power="ultra"><canvas width="44" height="44"></canvas><div class="pill-body"><b>TECH ULTRA BOT</b><i><u></u></i></div></div>
+        </div>
+        <div class="hud-right">
+          <button class="icon-btn" id="btn-sound" aria-label="Toggle sound" title="Sound (M)">
+            <svg viewBox="0 0 24 24" class="ico-on"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 8.5a5 5 0 010 7M18.5 6a8.5 8.5 0 010 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <svg viewBox="0 0 24 24" class="ico-off"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 9.5l5 5m0-5l-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+          <button class="icon-btn" id="btn-pause" aria-label="Pause" title="Pause (P)">
+            <svg viewBox="0 0 24 24"><rect x="6" y="5" width="4.5" height="14" rx="1.5"/><rect x="13.5" y="5" width="4.5" height="14" rx="1.5"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div id="hint" class="hidden">HOLD <kbd>SPACE</kbd> OR <kbd>TAP</kbd> TO FLY</div>
+      <div id="banner"><b></b><span></span></div>
+
+      <!-- ===== main menu ===== -->
+      <section id="screen-menu" class="screen hidden">
+        <div class="menu-panel">
+          <div class="logo" aria-label="Jetpack TECHride">
+            <strong>JETPACK</strong>
+            <span class="logo-a">TECH</span><span class="logo-b">RIDE</span>
+            <i class="logo-bar"></i>
+            <em>46 HOURS · ZERO CHAIRS</em>
+          </div>
+          <div class="menu-stats">
+            <div class="stat"><small>BEST</small><b><span id="menu-best">0</span> m</b></div>
+            <div class="stat"><small>TOTAL RAISED</small><b><canvas class="coin-ico" width="44" height="44"></canvas><span id="menu-bank">0</span></b></div>
+          </div>
+          <button class="btn btn-primary btn-xl" id="btn-play">PLAY<small>SPACE</small></button>
+          <div class="menu-grid">
+            <button class="btn" data-open="hangar">HANGAR</button>
+            <button class="btn" data-open="board">TOP 10</button>
+            <button class="btn" data-open="help">HOW TO PLAY</button>
+            <button class="btn" data-open="settings">SETTINGS</button>
+          </div>
+          <p class="menu-tip" id="menu-tip"></p>
+        </div>
+      </section>
+
+      <!-- ===== hangar ===== -->
+      <section id="screen-hangar" class="screen modal hidden">
+        <div class="panel">
+          <header><h2>HANGAR</h2><div class="chip"><canvas class="coin-ico" width="44" height="44"></canvas><span id="hangar-bank">0</span></div><button class="icon-btn close" data-close aria-label="Close">✕</button></header>
+          <div id="skins" class="skins"></div>
+        </div>
+      </section>
+
+      <!-- ===== leaderboard ===== -->
+      <section id="screen-board" class="screen modal hidden">
+        <div class="panel panel-narrow">
+          <header><h2>TOP 10</h2><button class="icon-btn close" data-close aria-label="Close">✕</button></header>
+          <div id="board" class="board"></div>
+        </div>
+      </section>
+
+      <!-- ===== how to play ===== -->
+      <section id="screen-help" class="screen modal hidden">
+        <div class="panel">
+          <header><h2>HOW TO PLAY</h2><button class="icon-btn close" data-close aria-label="Close">✕</button></header>
+          <div class="help">
+            <div class="help-card">
+              <h3>FLY</h3>
+              <p><b>Hold</b> <kbd>SPACE</kbd>, the mouse button or your finger to fire the jetpack. <b>Release</b> to fall.</p>
+              <p><kbd>P</kbd> pause &nbsp; <kbd>M</kbd> mute</p>
+              <p><b>Rides</b> change the controls and take one hit for you: the <b>Water Buggy</b> rises while you hold, the <b>Moving Van</b> flips between floor and ceiling.</p>
+              <p><b>Spell T-E-C-H.</b> Collect the four letters to call in <b>The F-150</b>: huge, white, and it smashes everything it touches. Tap to hop, tap twice to double-jump.</p>
+              <p class="muted">Every 50 m is one hour. Can you stay up for all <b>46</b>?</p>
+            </div>
+            <div class="help-card">
+              <h3>DODGE</h3>
+              <ul class="legend">
+                <li><span class="dot red"></span><div><b>Live Cables</b><span>Someone skipped cable management</span></div></li>
+                <li><span class="dot red"></span><div><b>Livestream Drones</b><span>They only want your good side</span></div></li>
+                <li><span class="dot red"></span><div><b>Merch Missiles</b><span>Free T-shirt, delivered at 60 mph</span></div></li>
+                <li><span class="dot pink"></span><div><b>Laser Show</b><span>The tracer shows where it fires</span></div></li>
+              </ul>
+              <p class="muted">If it glows red, don't touch it. (It was probably our fault.)</p>
+            </div>
+            <div class="help-card">
+              <h3>POWER UP</h3>
+              <ul class="legend powers">
+                <li><canvas data-icon="shield" width="56" height="56"></canvas><div><b>Moraler Shield</b><span>Takes one hit for you</span></div></li>
+                <li><canvas data-icon="magnet" width="56" height="56"></canvas><div><b>Canning Magnet</b><span>Pulls donations into your can</span></div></li>
+                <li><canvas data-icon="rush" width="56" height="56"></canvas><div><b>Donor Match</b><span>Every donation doubled</span></div></li>
+                <li><canvas data-icon="ultra" width="56" height="56"></canvas><div><b>Tech Ultra Bot</b><span>Huge, armoured, unstoppable</span></div></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== settings ===== -->
+      <section id="screen-settings" class="screen modal hidden">
+        <div class="panel panel-narrow">
+          <header><h2>SETTINGS</h2><button class="icon-btn close" data-close aria-label="Close">✕</button></header>
+          <div class="settings">
+            <div class="row"><label>Difficulty</label>
+              <div class="seg" id="set-diff">
+                <button data-v="0">CHILL</button><button data-v="1">STANDARD</button><button data-v="2">INTENSE</button>
+              </div>
+            </div>
+            <div class="row"><label for="set-sfx">Sound effects</label><input type="range" id="set-sfx" min="0" max="1" step="0.05"></div>
+            <div class="row"><label for="set-music">Music</label><input type="range" id="set-music" min="0" max="1" step="0.05"></div>
+            <div class="row"><label for="set-shake">Screen shake</label><input type="checkbox" class="switch" id="set-shake"></div>
+            <div class="row"><label for="set-effects">Full particle effects</label><input type="checkbox" class="switch" id="set-effects"></div>
+            <div class="row"><label for="set-hitboxes">Show hitboxes</label><input type="checkbox" class="switch" id="set-hitboxes"></div>
+            <div class="row row-actions">
+              <button class="btn btn-small" id="set-fullscreen">FULLSCREEN</button>
+              <button class="btn btn-small btn-danger" id="set-reset">RESET PROGRESS</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== pause ===== -->
+      <section id="screen-pause" class="screen modal hidden">
+        <div class="panel panel-tiny">
+          <h2 class="center">PAUSED</h2>
+          <button class="btn btn-primary" id="pause-resume">RESUME<small>P</small></button>
+          <button class="btn" id="pause-restart">RESTART</button>
+          <button class="btn" id="pause-menu">MAIN MENU</button>
+        </div>
+      </section>
+
+      <!-- ===== results ===== -->
+      <section id="screen-results" class="screen modal hidden">
+        <div class="panel panel-results">
+          <div class="ribbon hidden" id="res-ribbon">NEW BEST</div>
+          <h2 class="center" id="res-title">RUN COMPLETE</h2>
+          <div class="res-dist"><span id="res-dist">0</span><small>m</small></div>
+          <p class="res-quip" id="res-quip"></p>
+          <div class="res-stats">
+            <div><small>RAISED</small><b><canvas class="coin-ico" width="44" height="44"></canvas><span id="res-coins">0</span></b></div>
+            <div><small>CLOSE CALLS</small><b id="res-close">0</b></div>
+            <div><small>SMASHED</small><b id="res-smash">0</b></div>
+            <div><small>BEST</small><b><span id="res-best">0</span> m</b></div>
+          </div>
+          <div class="res-name hidden" id="res-name-row">
+            <label for="res-name">You made the Top 10 — sign it:</label>
+            <div><input id="res-name" maxlength="12" autocomplete="off" spellcheck="false" placeholder="DANCER"><button class="btn btn-small" id="res-save">SAVE</button></div>
+          </div>
+          <div class="res-actions">
+            <button class="btn" id="res-menu">MENU</button>
+            <button class="btn btn-primary" id="res-again">PLAY AGAIN<small>SPACE</small></button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<script src="js/util.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/art.js"></script>
+<script src="js/game.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
