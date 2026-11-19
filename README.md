@@ -99,12 +99,26 @@ are introduced one type at a time.
 
 **Also:** Line Dance stretches (a long hazard-free wave of donations),
 close-call bonuses, a marker showing your best distance as you approach it,
-a local Top 10, three difficulty levels, and a Hangar where the donations you
-have raised unlock five more bots. Each has its own gear and face, not just a
-colour: Cold Brew (a cup for a head, a bendy straw, a thermos jetpack), Ice
-Bath (snow cap, rubber duck), Glow Stick (neon that changes colour, an
-equaliser on its chest), Stage Crew (headset, backstage pass, torch) and
-Total Reveal (gold, crowned, twinkling). They all share the same hitbox.
+a local Top 10 and three difficulty levels.
+
+**The Hangar.** Donations unlock eight more characters. Each has its own gear
+and face, not just a colour, and they all share the same hitbox.
+
+| Character | Cost | What it is |
+|-----------|------|------------|
+| TECHBOT | free | The original bot, with duct tape |
+| Average Tech Captain | 100 | The "starter pack": comfort-set hoodie under a puffer vest, tired eyes, phone in hand |
+| Final Boss | 150 | A TECH captain in a navy suit and red tie, glasses, one upgraded eye, a laptop and a pocket-mainframe jetpack |
+| The Dribbler | 300 | Taller than everyone else. Messy dark hair, huge grin, and a stream of dribble that runs from his mouth, down his shirt in trickles and off the hem |
+| The Warrior | 400 | Cap, glasses, white hoodie, a can in each hand. Never blinks |
+| Glow Stick | 500 | Neon that changes colour, an equaliser on its chest |
+| Mr Active | 800 | Best dressed: knit sweater, belt, pleated trousers, tinted shades |
+| Total Reveal | 1,500 | Gold, crowned, twinkling |
+| The Director | 2,500 | The "legendary skin": the full comfort set, hood up, with a halo |
+
+Three of them are robots; the other six are committee members, drawn as
+cartoons from their outfits. `PERSON` in `js/art.js` sets each one's hair, hood
+or cap, glasses, beard and expression.
 
 Progress is stored in the browser (`localStorage`); Settings → Reset Progress clears it.
 
@@ -150,9 +164,9 @@ The radii are in one place: `HB` at the top of `js/game.js`.
 - **Obstacle patterns:** `PATTERNS` in `js/game.js`. Each function places hazards
   and returns how much room it used. Gaps between patterns are measured in
   time, so they stay fair as the speed rises.
-- **Bots:** `art.SKINS` in `js/art.js` holds the colours, names and prices. A
-  skin's `kit` selects its gear and face, drawn by the `kit*` functions just
-  below it.
+- **Characters:** `art.SKINS` in `js/art.js` holds the colours, names, blurbs
+  and prices. A skin's `kit` selects its gear and face, drawn by the `kit*`
+  and `person*` functions just below it.
 - **Arena colours:** `art.THEMES` in `js/art.js`. **Hour length:** `HOUR_M` in `js/game.js`.
 - **Name:** the title is in `index.html` (`<title>` and the `.logo` block).
 
