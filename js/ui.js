@@ -14,10 +14,12 @@
 
   const CAUSES = {
     gate: ['TRIPPED ON A LIVE CABLE', 'CABLE MANAGEMENT 1, ROBOT 0', 'WHO LEFT THAT PLUGGED IN?',
-      'SASHA SAID NOT TO TOUCH THAT', 'CLAUDE WROTE THAT CABLE'],
-    drone: ['PHOTOBOMBED BY A DRONE', 'THE LIVESTREAM GOT YOU', 'DARSH DODGES THOSE IN STYLE', 'SAY HI TO SASHA ON STREAM'],
-    missile: ['MERCH MISSILE TO THE FACE', 'FREE T-SHIRT! (AT 60 MPH)', 'COOKED. MICHELLE CALLED IT.'],
-    laser: ['YOU JOINED THE LASER SHOW', 'THE LIGHTING CREW SAYS SORRY', 'AIDAN: "CLAUDE CAN FIX THIS"'],
+      'SASHA SAID NOT TO TOUCH THAT', 'CLAUDE WROTE THAT CABLE', 'THE OVERLORD IS DISAPPOINTED'],
+    drone: ['PHOTOBOMBED BY A DRONE', 'THE LIVESTREAM GOT YOU', 'DARSH DODGES THOSE IN STYLE', 'SAY HI TO SASHA ON STREAM',
+      'OLIVIA WOULD HAVE OUTRUN THAT'],
+    missile: ['MERCH MISSILE TO THE FACE', 'FREE T-SHIRT! (AT 60 MPH)', 'COOKED. MICHELLE CALLED IT.', 'STILL FASTER THAN THE STORE'],
+    laser: ['YOU JOINED THE LASER SHOW', 'THE LIGHTING CREW SAYS SORRY', 'AIDAN: "CLAUDE CAN FIX THIS"',
+      'ADITHYA: "WORKS ON MY MACHINE"', 'ANNA QUEUED ONE SONG TOO MANY'],
   };
   const TIPS = [
     'No sitting. No sleeping. No unplugging the robot.',
@@ -40,15 +42,24 @@
     'Legendary skin: the full comfort set. Starter pack: just the hoodie.',
     'For the table: pretzels, boneless wings, wonton tacos. All of them.',
     'The Final Boss has entered the dance floor. He brought a laptop.',
+    'Made by David Brown. Complaints go to Sasha.',
+    'All decisions are final. Signed, the Overlord.',
+    'Charlotte says the store will be done next week. She has said it for six months.',
+    'Olivia could run this tunnel for 1,000 miles without stopping. You get 46 hours.',
+    'Retreat attendance: everyone but Olivia. She had a race.',
+    'Anna has added 1,000,000 songs to this playlist. It was already 46 hours long.',
+    'Do not hand Anna the aux. (Someone handed Anna the aux.)',
+    'Adithya cannot come to the phone. He works at Google now. Full time. He will mention it.',
+    'Systems lead status: tuff as heck.',
   ];
   const pickOne = (a) => a[Math.floor(Math.random() * a.length)];
   // results line: [hours below this, the options]
   const HOUR_QUIPS = [
-    [2, ['The opening ceremony lasted longer.', 'Michelle lasted longer, and Michelle is cooked.']],
+    [2, ['The opening ceremony lasted longer.', 'Michelle lasted longer, and Michelle is cooked.', 'Still quicker than the store launch.']],
     [8, ['Barely warmed up. The dancers are unimpressed.', 'Darsh has not even picked an outfit yet.']],
-    [16, ['Respectable. Your feet disagree.', 'Respectable. Aidan is asking Claude how to do better.']],
+    [16, ['Respectable. Your feet disagree.', 'Respectable. Aidan is asking Claude how to do better.', 'Olivia does this much before breakfast.']],
     [24, ['Deep into the night shift. Somebody get this bot a snack.', 'Deep into the night shift. Half apps cannot come soon enough.']],
-    [36, ['Past halfway, powered entirely by vibes.', 'Past halfway. Officially cooked, still standing.']],
+    [36, ['Past halfway, powered entirely by vibes.', 'Past halfway. Officially cooked, still standing.', 'Past halfway. The Overlord is mildly impressed.']],
     [46, ['So close. The finish line could taste it.', 'So close. Sasha is pretending not to be impressed.']],
   ];
   function hourQuip(h) {
@@ -138,7 +149,9 @@
     $('#hangar-bank').textContent = fmt(d.bank);
     const box = $('#skins');
     box.innerHTML = '';
-    for (const s of art.SKINS) {
+    const list = art.SKINS.filter((s) => !s.secret || d.owned.includes(s.id));
+    box.classList.toggle('scroll', list.length > 9);
+    for (const s of list) {
       const owned = d.owned.includes(s.id), equipped = d.skin === s.id;
       const card = document.createElement('div');
       card.className = 'skin' + (equipped ? ' equipped' : '') + (owned ? '' : ' locked') + (s.tag === 'LEGENDARY' ? ' legendary' : '');
@@ -216,6 +229,16 @@
     const box = $('#board');
     box.innerHTML = '';
     const b = save.data.board;
+    // above first place, always, and not up for discussion
+    const top = document.createElement('div');
+    top.className = 'line overlord';
+    for (const [cls, text] of [['rk', '0'], ['nm', 'THE OVERLORD'], ['ds', '\u221e m'], ['md', 'MARILYN']]) {
+      const s = document.createElement('span');
+      s.className = cls;
+      s.textContent = text;
+      top.append(s);
+    }
+    box.append(top);
     if (!b.length) {
       const e = document.createElement('div');
       e.className = 'empty';
@@ -261,6 +284,7 @@
 
   ui.banner = function (title, sub, color) {
     const b = el.banner;
+    b.style.left = G.state === 'menu' ? '32%' : ''; // clear of the menu panel
     b.style.setProperty('--bc', color || '#38d6ff');
     b.firstElementChild.textContent = title;
     b.lastElementChild.textContent = sub || '';
@@ -345,10 +369,47 @@
     show(el.screens.pause, false);
     show(el.screens.results, true);
     show($('#res-ribbon'), res.newBest);
-    $('#res-title').textContent = CAUSES[res.cause] ? pickOne(CAUSES[res.cause]) : 'RUN COMPLETE';
-    $('#res-quip').textContent = hourQuip(res.hours || 0);
+    let title = CAUSES[res.cause] ? pickOne(CAUSES[res.cause]) : 'RUN COMPLETE', quip = hourQuip(res.hours || 0);
+    let label = 'RAISED';
+    // --- easter eggs ---
+    const exact46 = res.coins === 46;
+    if (res.egg === 'claude') {
+      title = 'CLAUDE DID THAT';
+      quip = res.hours >= 46 ? 'Aidan mode: Claude did all 46 hours for you. It does not count, and Aidan will never stop talking about it.'
+        : 'Aidan mode: Claude stayed up ' + (res.hours || 0) + ' of 46 hours for you. It does not count, but Aidan is very proud.';
+    } else if (res.time < 10) {
+      title = 'SPEEDRUN';
+      quip = 'Out in ' + res.time.toFixed(1) + ' seconds. Michelle called it: cooked.';
+    } else if (res.egg === 'cooked') title = 'COOKED.';
+    else if (res.egg === 'overlord') {
+      title = 'THE OVERLORD IS DISPLEASED';
+      quip = 'The Overlord reviewed your ' + (res.hours || 0) + ' hours and has notes. Many notes.';
+      label = 'TRIBUTE';
+    } else if (res.egg === 'adithya') {
+      title = 'TOO TUFF';
+      quip = 'Systems lead mode: the shield kept growing back and you still went down in hour ' + (res.hours || 0)
+        + '. It does not count. Adithya has a real job to get to.';
+    } else if (res.egg === 'anna') {
+      label = 'SONGS ADDED';
+      quip = 'Anna added ' + fmt(res.coins) + ' million songs to the playlist. It now runs for about '
+        + fmt(Math.max(1, Math.round(res.coins * 6.7))) + ' years.';
+    } else if (res.egg === 'olivia')
+      quip = 'Olivia pace for ' + (res.hours || 0) + ' of 46 hours. She would still be running. She skipped retreat for less.';
+    if (res.egg === 'sasha') {
+      label = 'ON SASHA';
+      quip = 'Sasha covered all ' + fmt(res.coins) + ' donations. Venmo her back. Seriously.';
+    } else if (res.egg === 'apps') label = 'APPS EATEN';
+    if (exact46) {
+      title = 'EXACTLY 46';
+      quip = '46 donations for 46 hours. You did that on purpose. Right?';
+      G.confetti();
+    }
+    $('.panel-results').classList.toggle('gold', exact46);
+    $('#res-coins').closest('div').querySelector('small').textContent = label;
+    $('#res-title').textContent = title;
+    $('#res-quip').textContent = quip;
     $('#res-dist').textContent = '0';
-    $('#res-coins').textContent = '+' + fmt(res.coins);
+    $('#res-coins').textContent = '+' + fmt(res.coins) + (res.egg === 'anna' ? 'M' : '');
     $('#res-close').textContent = res.closeCalls;
     $('#res-smash').textContent = res.smashed;
     $('#res-best').textContent = fmt(save.data.best);
@@ -368,6 +429,23 @@
     }
   };
 
+  // what the board has to say to certain names
+  const SIGNED = {
+    SASHA: 'Venmo requests sent to everyone.',
+    DARSH: 'Fit check passed.',
+    AIDAN: 'Claude says hi.',
+    MICHELLE: 'Cooked, but on the board.',
+    BRANDON: 'The Final Boss has entered the chat.',
+    DAVID: 'The maker of the game. Everybody bow.',
+    CLAUDE: 'I would never. (Aidan might.)',
+    WARRIOR: 'He did not blink.',
+    MARILYN: 'All hail the Overlord.',
+    OVERLORD: 'You are not her. Nice try.',
+    CHARLOTTE: 'The store is almost done. Promise.',
+    OLIVIA: 'Ran here. Did not stop. Skipped retreat for this.',
+    ANNA: '1,000,000 songs added to the queue.',
+    ADITHYA: 'Systems lead. Google, full time. Tuff as heck.',
+  };
   function commitScore() {
     if (!results || !results.qualifies || results.saved) return;
     results.saved = true;
@@ -379,12 +457,74 @@
     inp.disabled = true;
     inp.blur();
     $('#res-save').disabled = true;
-    $('#res-name-row').firstElementChild.textContent = 'Signed — you are #' + (rank + 1) + ' on the board.';
+    const reply = SIGNED[name.split(/\s+/)[0]];
+    $('#res-name-row').firstElementChild.textContent = 'Signed — you are #' + (rank + 1) + ' on the board.' + (reply ? ' ' + reply : '');
     results.rank = rank;
   }
   ui.commitScore = commitScore;
   // short guard so a held key at the moment of the crash doesn't restart instantly
   ui.canRestart = () => results && performance.now() - resultsAt > 550;
+
+  /* ---------- Sasha's bank account ----------
+   * She pays for everything and nobody Venmos her back. Purely for show: the
+   * real total is put back afterwards. */
+  let draining = false;
+  ui.sashaDrain = function () {
+    if (draining) return;
+    draining = true;
+    const stat = $('#menu-bank'), box = stat.closest('.stat');
+    const start = save.data.bank, t0 = performance.now(), DUR = 3400, OUT = 460;
+    const items = ['HALF APPS FOR 12', 'PARKING', 'T-SHIRT ORDER', '"I WILL VENMO YOU"', 'RIDE HOME ×6', 'PIZZA ×9', 'GROUP GIFT', 'SNACK RUN'];
+    let n = 0;
+    box.classList.add('draining');
+    const iv = setInterval(() => {
+      const line = document.createElement('i');
+      line.className = 'venmo';
+      line.textContent = '−$' + (6 + Math.random() * 52).toFixed(2) + '  ' + items[n++ % items.length];
+      box.append(line);
+      setTimeout(() => line.remove(), 1300);
+      A.play('tick');
+    }, 300);
+    const tick = () => {
+      const k = Math.min(1, (performance.now() - t0) / DUR);
+      stat.textContent = fmt(start - OUT * k);
+      if (k < 1) return requestAnimationFrame(tick);
+      clearInterval(iv);
+      setTimeout(() => {
+        stat.textContent = fmt(save.data.bank);
+        box.classList.remove('draining');
+        draining = false;
+        if (G.state === 'menu') ui.banner('VENMO REQUESTS SENT: 14', 'Paid back so far: 0.', '#ff8fa3');
+      }, 1300);
+    };
+    tick();
+  };
+
+  /* ---------- Charlotte's store ----------
+   * It has been nearly finished for six months. The bar gets to 99%. */
+  let storeBusy = false;
+  ui.storeLoading = function () {
+    if (storeBusy) return;
+    storeBusy = true;
+    const pop = document.createElement('div');
+    pop.className = 'store-pop';
+    pop.innerHTML = '<b>THE STORE</b><i><u></u></i><span></span><small></small>';
+    el.screens.menu.append(pop);
+    const bar = $('u', pop), pct = $('span', pop), note = $('small', pop);
+    const t0 = performance.now();
+    const tick = () => {
+      const s = (performance.now() - t0) / 1000;
+      // races to 99, then crawls and never arrives
+      const v = s < 2.6 ? 99 * (1 - Math.pow(1 - s / 2.6, 3)) : Math.min(99.9, 99 + (s - 2.6) * 0.09);
+      bar.style.width = v + '%';
+      pct.textContent = 'Launching\u2026 ' + v.toFixed(s < 2.6 ? 0 : 1) + '%';
+      note.textContent = s < 2.6 ? '' : s < 5.4 ? 'Almost done! \u2014 Charlotte' : 'Time remaining: 1 week. (It has said that for 6 months.)';
+      if (s < 9.5 && G.state === 'menu') return requestAnimationFrame(tick);
+      pop.remove();
+      storeBusy = false;
+    };
+    tick();
+  };
 
   /* ---------- per-frame ---------- */
   ui.update = function (dt) {

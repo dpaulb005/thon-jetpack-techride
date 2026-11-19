@@ -8,7 +8,7 @@
   const W = TR.W, H = TR.H, CEIL = TR.CEIL, FLOOR = TR.FLOOR;
 
   const OUTLINE = '#080d1f';
-  const FONT = '"Chakra Petch", "Segoe UI", system-ui, sans-serif';
+  const FONT = '"Fredoka", "Segoe UI", system-ui, sans-serif';
   const HAZARD = '#ff4757'; // everything dangerous glows this red
   const LASER = '#ff2e88';
 
@@ -129,6 +129,12 @@
       limb: '#e3f0a0', limbLo: '#b7cc68', shoe: '#1b2440', pack: '#6b5524', packLo: '#3a2d10',
       eye: '#1c1a22', accent: '#ffd23f', flame: '#ffe066', flameCore: '#ffffff',
       sparks: ['#e3f0a0', '#ffd23f', '#ffffff'] },
+    // `secret`: not in the Hangar until it has been unlocked (js/eggs.js)
+    { id: 'cardboard', name: 'TECHBOT MK I', tag: 'SECRET', secret: true, cost: 0, kit: 'cardboard',
+      blurb: 'The original original: cardboard, foil, green tape and one very warm volunteer.',
+      body: '#dfe4ec', bodyLo: '#9aa3b3', head: '#dfe4ec', headLo: '#9aa3b3', hand: '#e8bd98', noVisor: true,
+      limb: '#d9dee7', limbLo: '#9aa3b3', leg: '#e8bd98', legLo: '#cf9c74', shoe: '#f4f6fb',
+      pack: '#b98d5c', packLo: '#8a6238', eye: '#2f6fe0', accent: '#39e03a', flame: '#ffb020', flameCore: '#fff6d6' },
   ];
   art.skin = (id) => art.SKINS.find((s) => s.id === id) || art.SKINS[0];
 
@@ -219,11 +225,34 @@
     director: { hood: COMFORT, fringe: '#7a5636', brow: '#5d4129', eyes: 'happy', mouth: 'grin', halo: true },
     dribbler: { hair: '#2a1f1a', messy: true, brow: '#2a1f1a', mouth: 'grin' },
     darsh: { hair: '#17130f', brow: '#17130f', beard: '#17130f', glasses: 'tint', mouth: 'grin' },
+    // not in the Hangar: they turn up in the world (see the cameos in game.js)
+    marilyn: { hair: '#1a1512', long: true, brow: '#1a1512', glasses: 'rect', mouth: 'grin' },
+    olivia: { hair: '#1a1512', pony: true, brow: '#1a1512', eyes: 'happy', mouth: 'grin' },
     warrior: { cap: ['#d5d9e1', '#26365f'], hair: '#17130f', brow: '#17130f', beard: '#17130f', glasses: 'rect',
       mouth: 'smirk', hoodDown: '#f3f5f9', noBlink: true },
   };
 
-  function personHeadBack(ctx, P) {
+  function personHeadBack(ctx, P, t) {
+    if (P.long) {
+      // long hair, down past the shoulders
+      ctx.beginPath();
+      ctx.moveTo(-18, -44);
+      ctx.quadraticCurveTo(-29, -24, -24, 2);
+      ctx.quadraticCurveTo(-17, 8, -9, 3);
+      ctx.quadraticCurveTo(-6, -14, -8, -30);
+      ctx.closePath();
+      fillStroke(ctx, P.hair, 2.2);
+    }
+    if (P.pony) {
+      // a ponytail, streaming out behind
+      const sw = Math.sin(t * 14) * 3;
+      ctx.beginPath();
+      ctx.moveTo(-17, -43);
+      ctx.quadraticCurveTo(-37, -45 + sw, -38, -28 + sw);
+      ctx.quadraticCurveTo(-30, -27 + sw, -19, -34);
+      ctx.closePath();
+      fillStroke(ctx, P.hair, 2.2);
+    }
     if (P.hoodDown) {
       // the hood, bunched up behind the neck
       ctx.beginPath();
@@ -508,10 +537,89 @@
     }
   }
 
+  // kitchen foil, for the cardboard original
+  function foil(ctx, x, y, w, h) {
+    const g = ctx.createLinearGradient(x, y, x + w, y + h);
+    g.addColorStop(0, '#f1f4f8');
+    g.addColorStop(0.45, '#a3adbd');
+    g.addColorStop(0.7, '#e3e8ef');
+    g.addColorStop(1, '#8e98aa');
+    return g;
+  }
+  // a foil-covered box edged with green tape
+  function tapedBox(ctx, x, y, w, h, tape) {
+    ctx.beginPath();
+    ctx.rect(x, y, w, h);
+    fillStroke(ctx, foil(ctx, x, y, w, h), 2.5);
+    ctx.strokeStyle = tape;
+    ctx.lineWidth = 3;
+    ctx.strokeRect(x + 2.7, y + 2.7, w - 5.4, h - 5.4);
+    ctx.strokeStyle = 'rgba(255,255,255,0.65)'; // creases in the foil
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x + w * 0.3, y + h * 0.25);
+    ctx.lineTo(x + w * 0.55, y + h * 0.42);
+    ctx.moveTo(x + w * 0.62, y + h * 0.6);
+    ctx.lineTo(x + w * 0.36, y + h * 0.78);
+    ctx.stroke();
+  }
+
+  // The Overlord's hat: a trucker cap airbrushed lime, with TECH on the front.
+  // Whoever is playing wears it in Overlord mode, over whatever is already there.
+  function techHat(ctx) {
+    ctx.beginPath(); // mesh back
+    ctx.moveTo(-21.5, -40);
+    ctx.quadraticCurveTo(-23, -58, -2, -59);
+    ctx.quadraticCurveTo(18, -59.5, 22, -43);
+    ctx.closePath();
+    fillStroke(ctx, '#15161f', 2.2);
+    ctx.beginPath(); // foam front
+    ctx.moveTo(-6, -58.8);
+    ctx.quadraticCurveTo(18, -59.5, 22, -43);
+    ctx.lineTo(-6, -41.2);
+    ctx.closePath();
+    const g = ctx.createLinearGradient(0, -59, 0, -42);
+    g.addColorStop(0, '#6dff3a');
+    g.addColorStop(0.55, '#b9ff8f');
+    g.addColorStop(1, '#ffffff');
+    fillStroke(ctx, g, 1.8);
+    ctx.beginPath(); // brim
+    ctx.moveTo(11, -45.4);
+    ctx.quadraticCurveTo(26, -48, 37, -41);
+    ctx.quadraticCurveTo(26, -39.2, 11, -40.8);
+    ctx.closePath();
+    fillStroke(ctx, '#15161f', 2);
+    ctx.save();
+    ctx.translate(8, -48.6);
+    ctx.rotate(0.07);
+    ctx.fillStyle = '#15161f';
+    ctx.font = '700 9.5px ' + FONT;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('TECH', 0, 0);
+    ctx.restore();
+  }
+
   // drawn over the standard jetpack
   function kitPack(ctx, skin, t) {
     const kit = skin.kit;
-    if (kit === 'brandon') {
+    if (kit === 'cardboard') {
+      // a cardboard box, taped shut
+      ctx.beginPath();
+      ctx.rect(-32, -19, 19, 34);
+      fillStroke(ctx, vgrad(ctx, -19, 15, skin.pack, skin.packLo), 2.4);
+      ctx.fillStyle = '#e2cf9e';
+      ctx.fillRect(-24.5, -17.8, 4, 31.6);
+      ctx.strokeStyle = 'rgba(60,35,10,0.55)'; // this way up
+      ctx.lineWidth = 1.3;
+      ctx.beginPath();
+      ctx.moveTo(-28.5, 6);
+      ctx.lineTo(-28.5, -2);
+      ctx.moveTo(-30.3, 0.4);
+      ctx.lineTo(-28.5, -2.4);
+      ctx.lineTo(-26.7, 0.4);
+      ctx.stroke();
+    } else if (kit === 'brandon') {
       // a pocket mainframe: blue rack stripes and status lights
       rr(ctx, -29.5, -16.5, 15, 29, 4);
       ctx.fillStyle = skin.packLo;
@@ -543,7 +651,9 @@
       ctx.fillStyle = col || '#0c1430';
       ctx.fill();
     };
-    if (kit === 'brandon') {
+    if (kit === 'cardboard') {
+      tapedBox(ctx, -16, -16, 32, 36, skin.accent);
+    } else if (kit === 'brandon') {
       // navy suit: shirt, collar and a red tie
       ctx.beginPath();
       ctx.moveTo(-3, -13.6);
@@ -650,6 +760,21 @@
       ctx.closePath();
       fillStroke(ctx, skin.limb, 1.6);
       hoodStrings(ctx);
+    } else if (kit === 'marilyn') {
+      // a plain grey sweatshirt
+    } else if (kit === 'olivia') {
+      // striped tee with a navy collar
+      ctx.save();
+      rr(ctx, -15, -15, 30, 34, 9);
+      ctx.clip();
+      ctx.fillStyle = '#3d4a7a';
+      for (let y = -9; y < 19; y += 4.4) ctx.fillRect(-15, y, 30, 1.1);
+      ctx.fillRect(-4, -15, 18, 3.4);
+      ctx.restore();
+      rr(ctx, -15, -15, 30, 34, 9);
+      ctx.strokeStyle = OUTLINE;
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
     } else if (kit === 'director' || kit === 'warrior') {
       // hoodie: front pocket and drawstrings
       ctx.beginPath();
@@ -744,7 +869,15 @@
   // drawn behind the helmet; returns true when it stands in for the antenna
   function kitHeadBack(ctx, skin, t, ant) {
     const kit = skin.kit;
-    if (PERSON[kit]) return personHeadBack(ctx, PERSON[kit]);
+    if (PERSON[kit]) return personHeadBack(ctx, PERSON[kit], t);
+    if (kit === 'cardboard') {
+      // a strip of green tape for an antenna
+      ctx.beginPath();
+      ctx.moveTo(11, -46);
+      ctx.lineTo(15 - ant, -60);
+      tube(ctx, 2.4, skin.accent);
+      return true;
+    }
     if (kit === 'glow') {
       // a pair of glow sticks
       for (const g of [[-9, -15, -62, 0], [7, 13, -60, 2]]) {
@@ -767,6 +900,7 @@
   function kitHeadFront(ctx, skin, t, ant) {
     const kit = skin.kit;
     if (PERSON[kit]) return personHeadFront(ctx, skin, PERSON[kit], t);
+    if (kit === 'cardboard') return tapedBox(ctx, -20, -48, 42, 33, skin.accent);
     if (kit === 'brandon') {
       // dark hair with some height, swept across the forehead
       ctx.beginPath();
@@ -837,6 +971,16 @@
     const kit = skin.kit;
     if (!kit) return false;
     if (PERSON[kit]) return personEyes(ctx, skin, s, PERSON[kit]), true;
+    if (kit === 'cardboard') {
+      // two blue bottle caps. They do not blink.
+      for (const ex of [2, 12.6]) {
+        ctx.beginPath();
+        ctx.arc(ex, -35.4, 4.3, 0, TAU);
+        fillStroke(ctx, skin.eye, 1.5);
+        dot(ctx, ex, -35.4, 1.7, '#ffffff');
+      }
+      return true;
+    }
     const shut = (c) => {
       ctx.fillStyle = c;
       ctx.fillRect(-1.5, -32.8, 6, 1.6);
@@ -878,7 +1022,20 @@
   // drawn over the finished head
   function kitHeadOver(ctx, skin, t, ant) {
     const kit = skin.kit;
-    if (kit === 'brandon') {
+    if (kit === 'cardboard') {
+      // the mouth hole (someone is looking out of it)
+      ctx.beginPath();
+      ctx.moveTo(-1, -28);
+      ctx.lineTo(15.4, -28);
+      ctx.lineTo(12.6, -21.6);
+      ctx.lineTo(1.8, -21.6);
+      ctx.closePath();
+      ctx.fillStyle = '#141018';
+      ctx.fill();
+      ctx.strokeStyle = skin.accent;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    } else if (kit === 'brandon') {
       // eyebrows, nose and a small smile
       ctx.strokeStyle = '#15161f';
       ctx.lineWidth = 1.5;
@@ -1058,6 +1215,10 @@
     // everything above the hips moves up
     const tall = U ? 0 : skin.tall || 0;
     if (tall) ctx.translate(0, -tall);
+    // sitting down (the menu bot does it when nobody is looking): the hips
+    // drop to the floor and the legs go out in front
+    const sit = U ? 0 : s.sit || 0;
+    if (sit) ctx.translate(0, sit * (16 + tall));
     ctx.lineJoin = 'round';
     ctx.lineCap = 'round';
 
@@ -1108,7 +1269,7 @@
     };
     const drawLeg = (hx, p, i, col) => {
       const f = legPos(p, i);
-      const fx = hx + f[0], fy = 17 + f[1] + tall;
+      const fx = lerp(hx + f[0], hx + 21 + tall * 0.8 - i * 2, sit), fy = lerp(17 + f[1] + tall, 20 + i * 1.5, sit);
       limb(ctx, hx, 17, fx, fy, 4, U ? 9.5 : 7.5, col);
       if (U) {
         // knee guard
@@ -1183,7 +1344,7 @@
         ctx.closePath();
         fillStroke(ctx, skin.packLo, 2.2);
       }
-    } else {
+    } else if (!skin.noPack) {
       rr(ctx, -31, -18, 18, 32, 6);
       fillStroke(ctx, vgrad(ctx, -18, 14, skin.pack, skin.packLo));
       ctx.fillStyle = skin.accent;
@@ -1389,6 +1550,7 @@
       }
     }
     if (!U) kitHeadOver(ctx, skin, t, ant);
+    if (!U && s.hat) techHat(ctx);
     ctx.restore();
 
     // --- spiked shoulder guard (sits over the near arm) ---
@@ -1518,6 +1680,364 @@
     const s = size || 34;
     ctx.drawImage(coinAtlas, f * COIN_PX, 0, COIN_PX, COIN_PX, x - s / 2, y - s / 2, s, s);
   };
+
+  // Half apps: a boneless wing, a pretzel stick or a wonton taco, drawn where a
+  // donation would be.
+  art.drawSnack = function (ctx, x, y, kind, size, t) {
+    const k = (size || 40) / 34;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(Math.sin((t || 0) * 3) * 0.16);
+    ctx.scale(k, k);
+    ctx.lineJoin = 'round';
+    if (kind === 0) {
+      ctx.beginPath(); // glazed wing
+      ctx.moveTo(-11, 2);
+      ctx.bezierCurveTo(-13, -8, -3, -11, 3, -8);
+      ctx.bezierCurveTo(11, -9, 14, -1, 10, 5);
+      ctx.bezierCurveTo(6, 11, -7, 10, -11, 2);
+      ctx.closePath();
+      fillStroke(ctx, vgrad(ctx, -10, 9, '#c9682a', '#8a3a12'), 2);
+      ctx.strokeStyle = 'rgba(255,220,170,0.7)';
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.moveTo(-6, -4);
+      ctx.quadraticCurveTo(0, -8, 6, -4.5);
+      ctx.stroke();
+      for (const d of [[-3, 2], [3, 4], [5, -1]]) dot(ctx, d[0], d[1], 0.9, '#fff3c9');
+    } else if (kind === 1) {
+      ctx.rotate(-0.5); // pretzel stick
+      rr(ctx, -14, -4.6, 28, 9.2, 4.6);
+      fillStroke(ctx, vgrad(ctx, -5, 5, '#c98232', '#8a4f18'), 2);
+      ctx.strokeStyle = 'rgba(255,225,170,0.6)';
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      for (const sx of [-8, -1, 6]) {
+        ctx.moveTo(sx, -2.6);
+        ctx.lineTo(sx + 3, 2.6);
+      }
+      ctx.stroke();
+      for (const d of [[-10, -1], [-4, 1.6], [2, -1.6], [9, 0.6], [12, -1.4]]) dot(ctx, d[0], d[1], 0.9, '#ffffff');
+    } else {
+      for (const lx of [-8, -2.6, 2.8, 8]) {
+        ctx.beginPath(); // slaw
+        ctx.arc(lx, -3.4, 4, 0, TAU);
+        fillStroke(ctx, lx === -2.6 ? '#ff9a3d' : '#8fdc5a', 1.6);
+      }
+      ctx.beginPath(); // wonton shell
+      ctx.arc(0, -3, 13, 0, Math.PI);
+      ctx.closePath();
+      fillStroke(ctx, vgrad(ctx, -3, 10, '#f6d268', '#d79a2a'), 2);
+      for (const d of [[-5, 2], [3, 4.6], [6, 0.6]]) dot(ctx, d[0], d[1], 0.9, '#b9781e');
+    }
+    ctx.restore();
+  };
+
+  // Anna has the aux: a music note where a donation would be
+  const NOTES = ['#b388ff', '#9fe8ff', '#ffd23f'];
+  art.drawNote = function (ctx, x, y, kind, size, t) {
+    const k = (size || 40) / 34, col = NOTES[kind % 3];
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(Math.sin((t || 0) * 3) * 0.14);
+    ctx.scale(k, k);
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    const heads = kind === 1 ? [[-8, 8], [7, 5]] : [[-3, 8]]; // a pair, or one on its own
+    ctx.beginPath(); // stems, and the beam or flag
+    for (const h of heads) {
+      ctx.moveTo(h[0] + 4.6, h[1] - 1);
+      ctx.lineTo(h[0] + 4.6, h[1] - 19);
+    }
+    if (kind === 1) {
+      ctx.moveTo(-3.4, -11);
+      ctx.lineTo(11.6, -14);
+    } else {
+      ctx.moveTo(1.6, -11);
+      ctx.quadraticCurveTo(9, -9, 8.5, -2);
+    }
+    ctx.strokeStyle = OUTLINE;
+    ctx.lineWidth = 6;
+    ctx.stroke();
+    ctx.strokeStyle = col;
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    for (const h of heads) {
+      ctx.beginPath();
+      ctx.ellipse(h[0], h[1], 5.6, 4.2, -0.4, 0, TAU);
+      fillStroke(ctx, col, 2);
+    }
+    ctx.restore();
+  };
+
+  /* ---------- cameos: people who turn up during a run ---------- */
+  const MARILYN = { kit: 'marilyn', noVisor: true, noPack: true, body: '#e3e6ec', bodyLo: '#b4bac8', head: '#f1c9a8', headLo: '#dba77d',
+    hand: '#f1c9a8', limb: '#e3e6ec', limbLo: '#b4bac8', pack: '#3a4258', packLo: '#1b2031', eye: '#1c1a22', accent: '#6dff3a',
+    flame: '#6dff3a', flameCore: '#ffffff' };
+  const OLIVIA = { kit: 'olivia', noVisor: true, noPack: true, body: '#f3ecd8', bodyLo: '#d8cfb6', head: '#eab98f', headLo: '#cf9a70',
+    hand: '#eab98f', limb: '#eab98f', limbLo: '#cf9a70', leg: '#22305e', legLo: '#141d3c', shoe: '#ff8a3d', pack: '#3a4258',
+    packLo: '#1b2031', eye: '#1c1a22', accent: '#9fe8ff', flame: '#9fe8ff', flameCore: '#ffffff' };
+
+  // The Overlord's saucer. She sits under the dome in her TECH hat and keeps a
+  // spotlight on whoever she has come to watch (px, py); `line` is what she says.
+  art.drawOverlordShip = function (ctx, x, y, t, line, px, py) {
+    y += Math.sin(t * 3) * 4;
+    if (px != null) {
+      const prev = ctx.globalCompositeOperation;
+      const beam = ctx.createLinearGradient(x, y + 20, px, py);
+      beam.addColorStop(0, 'rgba(125,255,74,0.3)');
+      beam.addColorStop(1, 'rgba(125,255,74,0.03)');
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.fillStyle = beam;
+      ctx.beginPath();
+      ctx.moveTo(x - 16, y + 18);
+      ctx.lineTo(x + 16, y + 18);
+      ctx.lineTo(px + 76, py + 46);
+      ctx.lineTo(px - 76, py + 46);
+      ctx.closePath();
+      ctx.fill();
+      ctx.globalCompositeOperation = prev;
+    }
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.beginPath(); // the glass, behind her
+    ctx.ellipse(0, -8, 34, 37, 0, Math.PI, TAU);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(159,232,255,0.2)';
+    ctx.fill();
+    art.drawRobot(ctx, { x: -3, y: 1, scale: 0.62, phase: 0, ground: 1, thrust: 0, vy: 0, t, ant: 0, blink: t % 3.4 < 0.12, hat: true }, MARILYN);
+    glow(ctx, 0, 28, 34, '#6dff3a', 0.6);
+    ctx.beginPath(); // belly
+    ctx.ellipse(0, 17, 42, 13, 0, 0, Math.PI);
+    ctx.closePath();
+    fillStroke(ctx, '#3a4258', 2.4);
+    ctx.beginPath(); // hull
+    ctx.ellipse(0, 8, 78, 18, 0, 0, TAU);
+    fillStroke(ctx, vgrad(ctx, -10, 26, '#d5dceb', '#5d6880'), 2.6);
+    ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.ellipse(0, 6, 64, 11, 0, Math.PI * 1.1, Math.PI * 1.9);
+    ctx.stroke();
+    for (let i = 0; i < 7; i++) {
+      // running lights round the rim
+      const lx = -60 + i * 20, on = (Math.floor(t * 7) + i) % 3 === 0;
+      dot(ctx, lx, 11 + (1 - (lx / 62) * (lx / 62)) * 4, 3.3, on ? '#8dff5a' : '#2f6a2a');
+    }
+    ctx.beginPath(); // the glass, in front
+    ctx.ellipse(0, -8, 34, 37, 0, Math.PI, TAU);
+    ctx.strokeStyle = OUTLINE;
+    ctx.lineWidth = 2.6;
+    ctx.stroke();
+    ctx.strokeStyle = 'rgba(255,255,255,0.65)';
+    ctx.lineWidth = 2.2;
+    ctx.beginPath();
+    ctx.ellipse(0, -8, 27, 30, 0, Math.PI * 1.12, Math.PI * 1.42);
+    ctx.stroke();
+    if (line) {
+      ctx.font = '700 16px ' + FONT;
+      const tw = ctx.measureText(line).width + 26, bx = -48 - tw, by = -74;
+      ctx.beginPath(); // tail
+      ctx.moveTo(bx + tw - 22, by + 26);
+      ctx.lineTo(-34, -34);
+      ctx.lineTo(bx + tw - 6, by + 16);
+      ctx.closePath();
+      fillStroke(ctx, '#ffffff', 2.4);
+      rr(ctx, bx, by, tw, 32, 11);
+      fillStroke(ctx, '#ffffff', 2.4);
+      ctx.fillStyle = OUTLINE;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(line, bx + tw / 2, by + 17);
+    }
+    ctx.restore();
+  };
+
+  // Olivia, running flat out along the floor
+  art.drawOlivia = function (ctx, x, t) {
+    art.drawRobot(ctx, { x, y: FLOOR - 40, scale: 1, rot: 0.14, phase: t * 22, ground: 1, thrust: 0, vy: 0, t, ant: 0 }, OLIVIA);
+  };
+
+  // One of Sasha's payment requests: a paper plane towing a banner. It flies
+  // right to left, and glows gold because catching it is a good thing.
+  art.drawPayPlane = function (ctx, x, y, t) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(Math.sin(t * 2.4 + 1.2) * 0.1);
+    ctx.lineJoin = 'round';
+    glow(ctx, 0, 0, 52, '#ffd23f', 0.5);
+    ctx.strokeStyle = OUTLINE; // tow line
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.moveTo(14, 2);
+    ctx.lineTo(36, 2);
+    ctx.stroke();
+    rr(ctx, 36, -12, 142, 28, 5);
+    fillStroke(ctx, '#fff7c9', 2.2);
+    ctx.fillStyle = OUTLINE;
+    ctx.font = '700 13px ' + FONT;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('VENMO SASHA BACK', 107, 2.5);
+    ctx.beginPath(); // the plane, nose to the left
+    ctx.moveTo(-32, 2);
+    ctx.lineTo(18, -15);
+    ctx.lineTo(8, 2);
+    ctx.lineTo(18, 13);
+    ctx.closePath();
+    fillStroke(ctx, '#ffffff', 2.2);
+    ctx.beginPath();
+    ctx.moveTo(-32, 2);
+    ctx.lineTo(8, 2);
+    ctx.lineTo(3, 10);
+    ctx.closePath();
+    fillStroke(ctx, '#cfd6e6', 1.8);
+    ctx.restore();
+  };
+
+  // Michelle mode: the floor is on fire
+  art.drawCooked = function (ctx, camX, t) {
+    const prev = ctx.globalCompositeOperation;
+    ctx.globalCompositeOperation = 'lighter';
+    const g = ctx.createLinearGradient(0, FLOOR - 300, 0, FLOOR);
+    g.addColorStop(0, 'rgba(255,120,20,0)');
+    g.addColorStop(1, 'rgba(255,120,20,' + (0.26 + 0.05 * Math.sin(t * 6)).toFixed(3) + ')');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, FLOOR - 300, W, 300);
+    ctx.globalCompositeOperation = prev;
+    const sc = camX * 0.9, first = Math.floor(sc / 90);
+    for (let i = first; i * 90 - sc < W + 60; i++) {
+      ctx.save();
+      ctx.translate(i * 90 - sc, FLOOR + 3);
+      ctx.scale(1, -1);
+      flame(ctx, 0, 0, 34 + 22 * Math.abs(Math.sin(i * 12.9898)), 9, '#ff9a3d', '#fff3c9', t + i * 0.37);
+      ctx.restore();
+    }
+  };
+
+  // Scenery extras, drawn in among the crowd: The Warrior, who turns up now
+  // and then and does not dance, and the neon sign for half apps hour.
+  let warriorSprite = null, appsSign = null, storeSprite = null;
+  function sceneryExtras(ctx, camX, t, halfApps) {
+    const sc = camX * 0.16; // the crowd's layer
+    if (halfApps) {
+      if (!appsSign) {
+        appsSign = makeCanvas(300, 120);
+        const g = appsSign.getContext('2d');
+        g.strokeStyle = 'rgba(180,190,220,0.5)';
+        g.lineWidth = 2;
+        g.beginPath();
+        g.moveTo(60, 0);
+        g.lineTo(60, 24);
+        g.moveTo(240, 0);
+        g.lineTo(240, 24);
+        g.stroke();
+        rr(g, 12, 22, 276, 86, 12);
+        g.fillStyle = 'rgba(6,10,26,0.88)';
+        g.fill();
+        g.strokeStyle = 'rgba(125,255,122,0.55)';
+        g.stroke();
+        g.textAlign = 'center';
+        g.textBaseline = 'middle';
+        g.shadowColor = '#7dff7a';
+        g.shadowBlur = 16;
+        g.fillStyle = '#c9ffc4';
+        g.font = '700 40px ' + FONT;
+        g.fillText('HALF APPS', 150, 56);
+        g.shadowColor = '#ffd23f';
+        g.shadowBlur = 10;
+        g.fillStyle = '#ffe9a3';
+        g.font = '600 15px ' + FONT;
+        g.fillText('9 PM  ·  DONATIONS ×2', 150, 90);
+      }
+      const x = ((((560 - sc) % 1700) + 1700) % 1700) - 300;
+      if (x < W) {
+        ctx.globalAlpha *= Math.sin(t * 31) > 0.96 ? 0.5 : 1; // the neon flickers
+        ctx.drawImage(appsSign, x, 296);
+        ctx.globalAlpha = 1;
+      }
+    }
+    // Charlotte's store: shutter down, opening soon, as it has been for six months
+    const sx = ((((3900 - sc) % 5200) + 5200) % 5200) - 210;
+    if (sx < W) {
+      if (!storeSprite) {
+        storeSprite = makeCanvas(200, 176);
+        const g = storeSprite.getContext('2d');
+        g.lineJoin = 'round';
+        g.fillStyle = '#26305a'; // the booth
+        g.fillRect(18, 52, 164, 122);
+        g.strokeStyle = OUTLINE;
+        g.lineWidth = 3;
+        g.strokeRect(18, 52, 164, 122);
+        const sh = g.createLinearGradient(0, 64, 0, 160); // roller shutter, down
+        sh.addColorStop(0, '#aab3c6');
+        sh.addColorStop(1, '#6f7a92');
+        g.fillStyle = sh;
+        g.fillRect(32, 64, 136, 100);
+        g.strokeRect(32, 64, 136, 100);
+        g.strokeStyle = 'rgba(8,13,31,0.35)';
+        g.lineWidth = 1.4;
+        g.beginPath();
+        for (let y = 74; y < 162; y += 9) {
+          g.moveTo(33, y);
+          g.lineTo(167, y);
+        }
+        g.stroke();
+        for (let i = 0; i < 8; i++) {
+          // striped awning
+          g.fillStyle = i % 2 ? '#ffffff' : '#39e03a';
+          g.beginPath();
+          g.moveTo(10 + i * 22.5, 30);
+          g.lineTo(32.5 + i * 22.5, 30);
+          g.lineTo(32.5 + i * 22.5, 52);
+          g.arc(21.25 + i * 22.5, 52, 11.25, 0, Math.PI);
+          g.closePath();
+          g.fill();
+        }
+        g.strokeStyle = OUTLINE;
+        g.lineWidth = 3;
+        g.strokeRect(10, 30, 180, 22);
+        rr(g, 36, 2, 128, 26, 6);
+        g.fillStyle = '#0c1430';
+        g.fill();
+        g.stroke();
+        g.fillStyle = '#ffffff';
+        g.font = '700 17px ' + FONT;
+        g.textAlign = 'center';
+        g.textBaseline = 'middle';
+        g.fillText('THE STORE', 100, 16);
+        g.save(); // the notice taped to the shutter
+        g.translate(100, 112);
+        g.rotate(-0.06);
+        g.fillStyle = '#fff7c9';
+        g.fillRect(-46, -24, 92, 48);
+        g.strokeRect(-46, -24, 92, 48);
+        g.fillStyle = OUTLINE;
+        g.font = '700 15px ' + FONT;
+        g.fillText('OPENING', 0, -9);
+        g.fillText('SOON', 0, 8);
+        g.restore();
+        g.globalCompositeOperation = 'source-atop'; // at the back of the room
+        g.fillStyle = 'rgba(8,12,34,0.34)';
+        g.fillRect(0, 0, 200, 176);
+      }
+      ctx.drawImage(storeSprite, sx, 396);
+    }
+    const wx = ((((2300 - sc) % 4200) + 4200) % 4200) - 160;
+    if (wx < W) {
+      if (!warriorSprite) {
+        warriorSprite = makeCanvas(150, 190);
+        const g = warriorSprite.getContext('2d');
+        art.drawRobot(g, { x: 62, y: 120, scale: 1.3, phase: 0, ground: 1, thrust: 0, vy: 0, t: 0, ant: 0 }, art.skin('warrior'));
+        g.globalCompositeOperation = 'source-atop'; // he is at the back of the room
+        g.fillStyle = 'rgba(8,12,34,0.4)';
+        g.fillRect(0, 0, 150, 190);
+      }
+      ctx.drawImage(warriorSprite, wx, 424, 114, 144);
+    }
+  }
 
   /* =====================================================================
    *  HAZARDS
@@ -2253,7 +2773,8 @@
       const lean = ride.whip || 0;
       const whip = lean * 8 + Math.sin(t * 9) * 1.3;
       const chrome = (y0, y1) => vgrad(ctx, y0, y1, '#f6f8ff', '#8f9bb8');
-      const white = vgrad(ctx, -46, 14, '#ffffff', '#c6cfe2');
+      const comfort = ride.paint === 'comfort'; // The Director's truck matches the set
+      const white = comfort ? vgrad(ctx, -46, 14, '#f0f8bd', '#b3c964') : vgrad(ctx, -46, 14, '#ffffff', '#c6cfe2');
       const TINT = '#131a2c';
 
       // ---- under the tail: hitch, chrome ball, exhaust tip ----
@@ -2593,7 +3114,7 @@
         ctx.lineTo(wx + 21.5, 19);
         ctx.arc(wx, 19, 21.5, 0, Math.PI, true);
         ctx.closePath();
-        fillStroke(ctx, vgrad(ctx, -7, 19, '#ffffff', '#b9c3d9'), 1.2);
+        fillStroke(ctx, ride.paint === 'comfort' ? vgrad(ctx, -7, 19, '#f0f8bd', '#a9c05c') : vgrad(ctx, -7, 19, '#ffffff', '#b9c3d9'), 1.2);
       }
     }
   };
@@ -2860,7 +3381,7 @@
       }
 
     const signs = ['NO SITTING', 'NO SLEEPING', 'TECH HQ', 'HYDRATE', 'SNACKS', 'TECH CREW', 'STAY UP', 'DANCE',
-      'HALF APPS', 'ASK SASHA', 'ASK CLAUDE', 'FIT CHECK', 'SO COOKED', 'COMFORT SET'];
+      'HALF APPS', 'ASK SASHA', 'ASK CLAUDE', 'FIT CHECK', 'SO COOKED', 'COMFORT SET', 'STORE: SOON', 'OVERLORD HQ', 'AUX: ANNA', 'SYSTEMS: OK'];
     for (let bay = 0; bay < 2; bay++) {
       const bx = bay * 800;
       const wx = bx + 140, wy = 142, ww = 620, wh = 388;
@@ -3124,6 +3645,10 @@
     return set;
   };
   // Build the next zone one layer at a time between frames, so there's no hitch.
+  // Each finished layer is drawn once into a scrap canvas straight away: that
+  // makes the browser do the real painting now instead of on its first frame
+  // on screen.
+  let scrap = null;
   art.prewarm = function (i) {
     i = ((i % art.THEMES.length) + art.THEMES.length) % art.THEMES.length;
     let set = themeCache[i];
@@ -3132,9 +3657,11 @@
       const k = BUILDERS.find((b) => !set[b]);
       if (!k) return;
       buildLayer(set, k);
-      setTimeout(step, 60);
+      if (!scrap) scrap = makeCanvas(8, 8).getContext('2d');
+      scrap.drawImage(set[k], 0, 0, 8, 8);
+      setTimeout(step, 140);
     };
-    setTimeout(step, 60);
+    setTimeout(step, 140);
   };
 
   function tile(ctx, img, scroll, tw, snap, y) {
@@ -3144,7 +3671,7 @@
   }
 
   art.BEAT_HZ = 1.8; // the crowd bounces in time with the music (108 bpm)
-  art.drawBackground = function (ctx, camX, set, snap, t) {
+  art.drawBackground = function (ctx, camX, set, snap, t, halfApps) {
     t = t || 0;
     const th = set.theme;
     tile(ctx, set.far, camX * 0.04, TW, snap);
@@ -3171,6 +3698,7 @@
     }
     ctx.globalCompositeOperation = prev;
     tile(ctx, set.mid, camX * 0.16, TW, snap, -Math.abs(Math.sin(t * Math.PI * art.BEAT_HZ)) * 6);
+    sceneryExtras(ctx, camX, t, halfApps);
     tile(ctx, set.wall, camX * 0.42, TW, snap);
     tile(ctx, set.near, camX * 0.72, TW, snap);
     tile(ctx, set.deck, camX, DECK_W, snap);

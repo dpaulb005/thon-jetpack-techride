@@ -11,7 +11,7 @@ as vector shapes on a canvas and the sound is synthesised in the browser.
 There are no image or audio files. The dance-marathon theme is carried by
 words and original drawings only (dancers, glow sticks, banners, the 46-hour
 clock); the game contains no event or organisation names, logos, marks or
-mascots. The only bundled asset is the Chakra Petch typeface (SIL
+mascots. The only bundled asset is the Fredoka typeface (SIL
 Open Font License, see `fonts/OFL.txt`).
 
 ## Play
@@ -155,7 +155,7 @@ The radii are in one place: `HB` at the top of `js/game.js`.
 | `js/game.js` | Physics, level generation, hazards, collisions, effects, rendering |
 | `js/ui.js` | Menus, HUD, results, Hangar, Top 10, settings |
 | `js/main.js` | Start-up, input, scaling, frame loop |
-| `fonts/` | Chakra Petch (OFL) |
+| `fonts/` | Fredoka (OFL) |
 
 ## Tuning
 

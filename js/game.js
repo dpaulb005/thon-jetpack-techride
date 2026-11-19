@@ -18,20 +18,22 @@
   const QUIP = {
     close: ['CLOSE CALL', 'NICE DODGE', 'TOO CLOSE', 'SMOOTH', 'DANCE MOVES', 'RULES & REGS SAW THAT',
       'CLAUDE SAW THAT', 'CLEAN LIKE DARSH', 'FIT CHECK PASSED', 'NOT COOKED YET', "DON'T TELL SASHA",
-      'LEGENDARY SKIN ENERGY', 'WARRIOR REFLEXES'],
+      'LEGENDARY SKIN ENERGY', 'WARRIOR REFLEXES', 'THE OVERLORD SAW THAT', 'OLIVIA PACE', 'TUFF', 'ANNA QUEUED THAT'],
     smash: ['SMASH', 'UNPLUGGED', 'TUB SMASH', 'RECYCLED', 'SHIPPED IT', 'CLAUDE DID THAT', 'MERGED TO MAIN', 'HALF OFF',
-      'WARRIOR MODE', 'FINAL BOSS DEFEATED'],
+      'WARRIOR MODE', 'FINAL BOSS DEFEATED', 'BY ORDER OF THE OVERLORD', 'SKIP TRACK', 'SYSTEMS NOMINAL'],
     ride: ["RIDE'S OVER", 'THERE GOES THE DEPOSIT', 'THAT WAS A RENTAL', 'WALK IT OFF', 'WE NEEDED THAT',
-      "WE'RE COOKED", 'BLAME SASHA', 'ASK CLAUDE FOR ANOTHER', 'BACK TO THE STARTER PACK'],
+      "WE'RE COOKED", 'BLAME SASHA', 'ASK CLAUDE FOR ANOTHER', 'BACK TO THE STARTER PACK', 'CHARLOTTE WILL FIX IT NEXT WEEK'],
     truck: ['ROAD CLOSED', 'RIGHT OF WAY', 'HONK HONK', 'NO BRAKES', 'OVERSIZE LOAD', 'THAT WILL BUFF OUT',
-      'HALF APPS OR BUST', 'SORRY SASHA', 'COMFORT SET CONVOY'],
+      'HALF APPS OR BUST', 'SORRY SASHA', 'COMFORT SET CONVOY', 'OVERLORD APPROVED'],
     // one list per 8-hour banner (hour 8, 16, 24, 32, 40)
     hours: [null,
-      ["Line dance o'clock", 'Darsh is already on outfit number three'],
-      ['The 3 AM slump. Stay standing.', 'Michelle reports that she is cooked'],
-      ['Halfway! Nobody sit down.', 'Halfway. Aidan asked Claude to confirm.'],
-      ['Pep rally energy', 'Sasha did not sign off on this hour'],
-      ['The final stretch', 'Half apps are so close you can smell them']],
+      ["Line dance o'clock", 'Darsh is already on outfit number three', 'Charlotte says the store launches this hour',
+        'Anna just added 400 more songs'],
+      ['The 3 AM slump. Stay standing.', 'Michelle reports that she is cooked', 'Olivia has lapped the building twice',
+        'Adithya is in a meeting at his real job'],
+      ['Halfway! Nobody sit down.', 'Halfway. Aidan asked Claude to confirm.', 'Halfway. So is the store. Allegedly.'],
+      ['Pep rally energy', 'Sasha did not sign off on this hour', 'The Overlord has entered the arena'],
+      ['The final stretch', 'Half apps are so close you can smell them', 'Olivia would call this the warm-up']],
   };
   const FOOT = 40, HEAD = 64; // runner's reach below / above its centre at scale 1
   const ULTRA_SCALE = 1.95;
@@ -59,6 +61,24 @@
 
   let nextId = 1;
 
+  /* Easter eggs (js/eggs.js is where they are triggered).
+   *   next - a code typed on the menu; it becomes `w.egg` for the next run:
+   *          'claude' (the autopilot flies), 'apps' (donations are snacks),
+   *          'cooked' (Michelle mode), 'sasha' (it all goes on Sasha's tab),
+   *          'overlord' (Marilyn is watching), 'olivia' (cross-country pace),
+   *          'anna' (donations are songs), 'adithya' (too tuff: the shield grows back)
+   *   sit  - the menu bot has been left alone for 46 s and has sat down
+   *   hour - the local hour; from 9 PM it is half apps hour */
+  const EGG = (TR.eggs = { next: null, sit: false, hour: () => new Date().getHours() });
+  const halfAppsHour = () => {
+    const h = EGG.hour();
+    return h >= 21 || h < 2;
+  };
+  const COOKED = ['Michelle is cooked', 'Still cooked', 'Cooked. Fully. Completely.', 'Michelle would like it noted: cooked'];
+  const OVERLORD = ['THE OVERLORD SAW THAT', 'THE OVERLORD APPROVES', 'NOTED BY THE OVERLORD', 'THE OVERLORD NODS'];
+  const hourLine = (w, z) => w.egg === 'cooked' ? pick(COOKED)
+    : QUIP.hours[z] ? pick(QUIP.hours[z]) : 'Overtime. Nobody told the robot to stop.';
+
   function newWorld(attract) {
     const save = TR.save.data;
     return {
@@ -84,6 +104,8 @@
       usedThrust: false, overT: 0,
       bestM: attract ? 0 : save.best, bestPassed: false,
       trail: [],
+      egg: null, halfApps: halfAppsHour(), sitK: 0,
+      cameo: null, nextCameo: attract ? rand(10, 16) : rand(8, 11), lastCameo: '',
     };
   }
 
@@ -620,9 +642,88 @@
     }
   }
 
+  /* ---------- cameos ----------
+   * People who turn up during a run. None of them can hurt you.
+   *   ship   - the Overlord drops in from above in her saucer to watch
+   *   olivia - Olivia overtakes you, on foot
+   *   plane  - one of Sasha's payment requests flies past: catch it to pay her back */
+  const SHIP_LINES = ['NOTED.', 'CARRY ON.', 'I AM WATCHING.', 'HMM.', 'ACCEPTABLE.', 'WHO APPROVED THIS?', 'WEAR THE HAT.'];
+  const shipY = (w) => clamp(w.p.y - 175, CEIL + 78, FLOOR - 310);
+  function startCameo(w) {
+    const pool = ['ship', 'olivia', 'plane'].filter((k) => k !== w.lastCameo && !(w.attract && k === 'plane'));
+    const type = w.egg === 'overlord' && w.lastCameo !== 'ship' ? 'ship' : pick(pool);
+    const c = (w.cameo = { type, t: 0 });
+    w.lastCameo = type;
+    if (type === 'ship') {
+      c.dur = 7.4;
+      c.y = shipY(w);
+      c.line = pick(SHIP_LINES);
+      if (!w.attract) A.play('letter', 3);
+    } else if (type === 'olivia') {
+      c.dur = 4;
+      c.x = -90;
+    } else {
+      c.dur = 8;
+      c.x = W + 90;
+      c.y0 = c.y = rand(CEIL + 140, FLOOR - 230);
+    }
+  }
+  function updateCameo(w, dt) {
+    const c = w.cameo, p = w.p;
+    c.t += dt;
+    if (c.type === 'ship') c.y = damp(c.y, shipY(w), 2.5, dt);
+    else if (c.type === 'olivia') {
+      c.x += 500 * dt;
+      if (!c.said && c.x > PX - 40) {
+        c.said = true;
+        floatText(w, PX + 60, FLOOR - 150, 'OLIVIA: ON YOUR LEFT', '#9fe8ff', 24);
+        if (!w.attract) A.play('tick');
+      }
+      if (chance(dt * 26)) smoke(w, w.camX + c.x - 14, FLOOR - 4, 1, -80, -20, 0.5);
+      if (c.x > W + 120) c.t = c.dur;
+    } else {
+      c.x -= 250 * dt;
+      c.y = c.y0 + Math.sin(c.t * 2.4) * 30;
+      const reach = w.ride ? 92 * art.RIDE_SCALE[w.ride.type] : 66 * p.scale;
+      if (!w.attract && !p.dead && Math.hypot(c.x - PX, c.y - (p.y - 10)) < reach) {
+        w.coins += 5;
+        floatText(w, PX + 50, Math.max(CEIL + 44, p.y - 110), 'YOU PAID SASHA BACK +5', '#ffd23f', 26);
+        burst(w, w.camX + c.x, c.y, 16, '#ffd23f', 460, { grav: 200 });
+        ring(w, w.camX + c.x, c.y, '#ffd23f', 120, 0.4);
+        A.play('buy');
+        TR.ui.coinPulse();
+        c.t = c.dur;
+      } else if (c.x < -250) {
+        if (!w.attract && !p.dead) floatText(w, 190, c.y, 'SASHA IS STILL WAITING', '#ff8fa3', 20);
+        c.t = c.dur;
+      }
+    }
+    if (c.t >= c.dur) {
+      w.cameo = null;
+      w.nextCameo = w.t + (w.attract ? rand(16, 26) : w.egg === 'overlord' ? rand(6, 9) : rand(13, 20));
+    }
+  }
+  function drawCameo(ctx, w, front) {
+    const c = w.cameo, p = w.p;
+    if (!c) return;
+    if (c.type === 'ship') {
+      if (!front) return;
+      // down from above, a few seconds of being watched, then away
+      const kin = easeOut(Math.min(1, c.t / 1.1)), out = clamp((c.t - 6.3) / 1.1, 0, 1);
+      const x = PX + 215 + Math.sin(c.t * 1.3) * 24 + out * out * 560;
+      const y = lerp(-150, c.y, kin) - out * out * 520;
+      const line = p.dead ? 'DISAPPOINTING.' : c.t > 1.4 && c.t < 5.4 ? c.line : '';
+      art.drawOverlordShip(ctx, x, y, w.t, line, out > 0 ? null : PX, p.y);
+    } else if (!front) {
+      if (c.type === 'olivia') art.drawOlivia(ctx, c.x, w.t);
+      else art.drawPayPlane(ctx, c.x, c.y, w.t);
+    }
+  }
+
   function updatePlayer(w, dt) {
     const p = w.p;
-    const thrusting = w.attract || G.debug.autopilot ? autopilot(w) : G.input.thrust;
+    const auto = w.attract ? !EGG.sit : G.debug.autopilot || w.egg === 'claude';
+    const thrusting = w.attract && EGG.sit ? false : auto ? autopilot(w) : G.input.thrust;
     if (thrusting && !w.usedThrust && !w.attract) {
       w.usedThrust = true;
       TR.ui.hint(false);
@@ -775,7 +876,8 @@
     G.state = 'over';
     const save = TR.save;
     const dist = Math.floor(w.dist);
-    const newBest = dist > save.data.best;
+    const assisted = w.egg === 'claude' || w.egg === 'adithya'; // the autopilot and the endless shield do not count
+    const newBest = !assisted && dist > save.data.best;
     const prevBest = save.data.best;
     if (newBest) save.data.best = dist;
     save.data.bank += w.coins;
@@ -785,7 +887,8 @@
     save.write();
     TR.ui.showResults({
       dist, coins: w.coins, newBest, prevBest, closeCalls: w.closeCalls, smashed: w.smashed,
-      qualifies: save.qualifies(dist), diff: w.diff.name, cause: w.cause, hours: Math.floor(w.dist / HOUR_M),
+      qualifies: !assisted && save.qualifies(dist), diff: w.diff.name, cause: w.cause, hours: Math.floor(w.dist / HOUR_M),
+      time: w.t, egg: w.egg,
     });
   }
 
@@ -857,7 +960,7 @@
     w.coins += 2;
     // pop up above the bot, or above whatever it is driving
     const lift = w.ride ? 52 * art.RIDE_SCALE[w.ride.type] + 34 : 96;
-    floatText(w, PX + 30, Math.max(CEIL + 40, w.p.y - lift), pick(QUIP.close) + ' +2', '#ffffff', 22);
+    floatText(w, PX + 30, Math.max(CEIL + 40, w.p.y - lift), (w.egg === 'cooked' ? 'COOKED' : w.egg === 'overlord' ? pick(OVERLORD) : pick(QUIP.close)) + ' +2', '#ffffff', 22);
     A.play('close');
   }
 
@@ -958,7 +1061,7 @@
       }
       if (dist < reach) {
         c.dead = true;
-        w.coins += w.rush > 0 ? 2 : 1;
+        w.coins += (w.rush > 0 ? 2 : 1) * (w.halfApps ? 2 : 1); // half apps hour doubles it again
         A.play('coin');
         if (TR.save.data.effects) {
           burst(w, c.x, c.y, 4, '#ffe680', 200, { type: 'dot', grav: 0, life: 0.7, size: 1.2, vx: w.speed });
@@ -1016,6 +1119,8 @@
       const truck = type === 'truck', dur = truck ? TRUCK_T : RIDE_T;
       w.ultra = 0;
       w.ride = { type, t: dur, dur, jumps: 0, dir: 1, flip: 1, spin: 0, jet: 0, whip: 0 };
+      // The Director's truck matches the comfort set
+      if (truck && TR.save.data.skin === 'director') w.ride.paint = 'comfort';
       addShake(w, truck ? 16 : 8);
       if (truck) {
         w.tech = 4;
@@ -1038,7 +1143,8 @@
     ring(w, x, y, def.color, 220, 0.5);
     burst(w, x, y, 20, def.color, 520, { grav: 200 });
     A.play('powerup');
-    TR.ui.banner(def.name, def.desc, def.color);
+    if (type === 'truck' && w.ride.paint) TR.ui.banner('THE COMFORT-150', 'It matches the set. Legendary skin, legendary truck.', '#e3f0a0');
+    else TR.ui.banner(def.name, def.desc, def.color);
   }
   G.grant = (type) => G.w && grant(G.w, type, G.w.camX + PX, G.w.p.y);
 
@@ -1053,13 +1159,33 @@
     if (alive) {
       const dm = w.dist / RAMP_M * w.diff.ramp;
       w.d = w.attract ? 0 : clamp(dm, 0, 1);
-      let target = w.attract ? 330 : lerp(SPEED_START, SPEED_MAX, smooth(w.d)) * w.diff.speed;
+      let target = w.attract ? (EGG.sit ? 0 : 330) : lerp(SPEED_START, SPEED_MAX, smooth(w.d)) * w.diff.speed;
+      if (w.egg === 'olivia') target = Math.max(target, 720 * w.diff.speed); // cross-country pace from the start
       if (w.ultra > 0) target *= 1.5;
       w.speed = damp(w.speed, target, 2.2, dt);
       updatePlayer(w, dt);
+      if (w.egg === 'adithya' && !w.shield) {
+        // too tuff to stay down: the shield grows back
+        w.shieldT = (w.shieldT || 0) + dt;
+        if (w.shieldT > 6) {
+          w.shieldT = 0;
+          w.shield = true;
+          floatText(w, PX + 40, Math.max(CEIL + 44, p.y - 104), 'TUFF. SHIELD BACK.', art.POWERUPS.shield.color, 26);
+          A.play('powerup');
+        }
+      }
+      // the menu bot, left alone too long, sits down
+      w.sitK = damp(w.sitK, w.attract && EGG.sit && p.onGround ? 1 : 0, 9, dt);
+      if (w.egg === 'cooked' && chance(dt * 34))
+        emit(w, {
+          type: 'dot', x: w.camX + rand(0, W), y: FLOOR - rand(0, 24), vx: w.speed * 0.9 + rand(-30, 30), vy: rand(-260, -90),
+          life: rand(0.8, 1.6), size: rand(3, 6), color: pick(['#ffb020', '#ff9a3d', '#ffd23f']), grav: -60, drag: 0,
+        });
     } else if (G.state === 'dying') {
       updateDying(w, dt);
     }
+    if (w.cameo) updateCameo(w, dt);
+    else if (alive && w.t > w.nextCameo) startCameo(w);
     w.camX += w.speed * dt;
     w.dist = w.camX / PPM;
     const cam = w.camX;
@@ -1200,20 +1326,37 @@
         w.zone = z;
         w.zoneMix = 0;
         art.getTheme(z);
-        art.prewarm(z + 1);
         const th = art.THEMES[z % art.THEMES.length];
-        TR.ui.banner('HOUR ' + z * 8, QUIP.hours[z] ? pick(QUIP.hours[z]) : 'Overtime. Nobody told the robot to stop.', th.accent);
+        TR.ui.banner('HOUR ' + z * 8, hourLine(w, z), th.accent);
         A.play('zone');
+      }
+      // build the next arena halfway through this one, well before it is needed,
+      // so none of that work lands on the moment of the change
+      if (w.warmed !== z && w.dist > (z + 0.5) * ZONE_M) {
+        w.warmed = z;
+        art.prewarm(z + 1);
       }
       if (!w.made46 && w.dist >= 46 * HOUR_M) {
         w.made46 = true;
         w.coins += 46;
-        TR.ui.banner('46 HOURS!', "You may now sit down. (You won't.)", '#ffd23f');
+        TR.ui.banner('46 HOURS!', pick(["You may now sit down. (You won't.)", 'You finished before the store did.']), '#ffd23f');
         floatText(w, PX + 60, p.y - 100, '46-HOUR BONUS +46', '#ffd23f', 34);
         for (const col of ['#ffd23f', '#38d6ff', '#ff7ad9', '#a6e22e']) burst(w, cam + PX + rand(0, 500), rand(200, 500), 22, col, 620, { grav: 300 });
         w.flash = 0.5;
         w.flashColor = '#ffd23f';
         A.play('best');
+        if (w.egg === 'claude') {
+          // the autopilot would go on for ever: Aidan mode stops at the finish line
+          w.done = true;
+          A.setThrust(0);
+          A.setMusicIntensity(0.25);
+          finish(w);
+          return;
+        }
+      }
+      if (!w.k1 && w.dist >= 1000) {
+        w.k1 = true;
+        floatText(w, PX + 120, Math.max(CEIL + 60, p.y - 110), '1,000 m. Olivia calls that a warm-up.', '#9fe8ff', 24);
       }
       // racing past your own record
       if (!w.bestPassed && w.bestM >= 100 && w.dist > w.bestM) {
@@ -1223,12 +1366,12 @@
         A.play('best');
       }
     }
-    if (w.zoneMix < 1) w.zoneMix = Math.min(1, w.zoneMix + dt / 1.5);
+    if (w.zoneMix < 1) w.zoneMix = Math.min(1, w.zoneMix + dt / 1.1);
   }
 
   G.update = function (dt) {
     const w = G.w;
-    if (!w || G.state === 'paused' || G.state === 'boot') return;
+    if (!w || w.done || G.state === 'paused' || G.state === 'boot') return;
     if (w.hitstop > 0) {
       w.hitstop -= dt;
       return;
@@ -1331,11 +1474,25 @@
 
     // --- scenery ---
     if (w.zoneMix < 1) {
-      art.drawBackground(ctx, cam, art.getTheme(w.prevZone), snap, t);
-      ctx.globalAlpha = smooth(w.zoneMix);
-      art.drawBackground(ctx, cam, art.getTheme(w.zone), snap, t);
-      ctx.globalAlpha = 1;
-    } else art.drawBackground(ctx, cam, art.getTheme(w.zone), snap, t);
+      // The new arena sweeps in from ahead. A wipe, not a cross-fade: that way
+      // every pixel is drawn once instead of twice.
+      const x = Math.round(W * (1 - smooth(w.zoneMix)));
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(-40, -40, x + 40, H + 80);
+      ctx.clip();
+      art.drawBackground(ctx, cam, art.getTheme(w.prevZone), snap, t, w.halfApps);
+      ctx.restore();
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(x, -40, W - x + 40, H + 80);
+      ctx.clip();
+      art.drawBackground(ctx, cam, art.getTheme(w.zone), snap, t, w.halfApps);
+      ctx.restore();
+      art.glow(ctx, x, H / 2, 90, art.getTheme(w.zone).theme.accent, 0.5);
+      ctx.fillStyle = 'rgba(255,255,255,0.75)';
+      ctx.fillRect(x - 2, 0, 4, H);
+    } else art.drawBackground(ctx, cam, art.getTheme(w.zone), snap, t, w.halfApps);
 
     // --- record marker ---
     if (w.bestM >= 100) {
@@ -1364,7 +1521,10 @@
     for (const c of w.coinList) {
       const x = c.x - cam;
       if (x < -30 || x > W + 30) continue;
-      art.drawCoin(ctx, x, c.y + Math.sin(c.ph * 3 + t * 4) * 2.5, t * 15 + c.ph * 8, w.rush > 0 ? 38 : 34);
+      const cy = c.y + Math.sin(c.ph * 3 + t * 4) * 2.5, cs = w.rush > 0 ? 38 : 34;
+      if (w.egg === 'apps') art.drawSnack(ctx, x, cy, Math.floor(c.ph * 7) % 3, cs + 8, t + c.ph);
+      else if (w.egg === 'anna') art.drawNote(ctx, x, cy, Math.floor(c.ph * 7) % 3, cs + 8, t + c.ph);
+      else art.drawCoin(ctx, x, cy, t * 15 + c.ph * 8, cs);
     }
     if (w.rush > 0) {
       for (const c of w.coinList) {
@@ -1380,6 +1540,8 @@
       const x = l.x - cam;
       if (x > -90 && x < W + 90) art.drawLetter(ctx, x, l.y + Math.sin(l.ph + t * 3) * 8, l.ch, t);
     }
+
+    if (w.egg === 'cooked') art.drawCooked(ctx, cam, t);
 
     // --- hazards ---
     for (const l of w.lasers) {
@@ -1399,6 +1561,7 @@
     for (const m of w.missiles) art.drawMissile(ctx, m.sx, m.y, t);
 
     drawParticles(ctx, w, false);
+    drawCameo(ctx, w, false);
 
     // --- the runner ---
     const intro = w.attract ? 0 : (1 - easeOut(Math.min(1, t / 0.75))) * 400;
@@ -1415,7 +1578,8 @@
     }
     const st = {
       x: rx, y: p.y, rot: p.rot, sx: p.sx, sy: p.sy, scale: p.scale, phase: p.phase, ground: p.dead ? 0 : p.ground,
-      thrust: p.thrust, vy: p.vy, t, blink: p.blink, ant: p.ant, dead: p.dead, ultra: big,
+      thrust: p.thrust, vy: p.vy, t, blink: p.blink, ant: p.ant, dead: p.dead, ultra: big, sit: w.sitK,
+      hat: w.egg === 'overlord', // the Overlord's own TECH trucker hat
     };
     if (w.ultra > 0) {
       art.glow(ctx, rx, p.y - 10, 230, art.TUB.trim, 0.3 + 0.08 * Math.sin(t * 12));
@@ -1489,6 +1653,8 @@
       }
     }
 
+    drawCameo(ctx, w, true);
+
     const prev = ctx.globalCompositeOperation;
     ctx.globalCompositeOperation = 'lighter';
     ctx.lineCap = 'round';
@@ -1544,6 +1710,7 @@
   G.toMenu = function () {
     G.w = newWorld(true);
     G.state = 'menu';
+    EGG.sit = false;
     art.getTheme(0);
     A.setThrust(0);
     A.setMusicIntensity(0);
@@ -1553,11 +1720,37 @@
     G.w = newWorld(false);
     G.state = 'playing';
     art.getTheme(0);
-    art.prewarm(1);
     A.play('start');
     A.setMusicIntensity(1);
-    TR.ui.hint(true);
-    TR.ui.banner('HOUR 0', '46 hours. No sitting. No sleeping. Go!', '#38d6ff');
+    const w = G.w;
+    w.egg = EGG.next;
+    EGG.next = null;
+    EGG.sit = false;
+    TR.ui.hint(w.egg !== 'claude');
+    if (w.egg === 'overlord') w.nextCameo = 2.5; // she is already on her way
+    if (w.egg === 'claude') TR.ui.banner('AIDAN MODE', 'Hands off. Claude is doing this one.', '#ffb86b');
+    else if (w.egg === 'apps') TR.ui.banner('HALF APPS', 'Donations are appetisers this run. Eat up.', '#7dff7a');
+    else if (w.egg === 'cooked') TR.ui.banner('MICHELLE MODE', 'Everything is cooked. Including you.', '#ff9a3d');
+    else if (w.egg === 'sasha') TR.ui.banner("SASHA'S TAB", 'This whole run is on Sasha. Venmo her back.', '#ff8fa3');
+    else if (w.egg === 'overlord') TR.ui.banner('ALL HAIL THE OVERLORD', 'Marilyn is watching this one. No pressure.', '#7dff4a');
+    else if (w.egg === 'anna') TR.ui.banner('ANNA HAS THE AUX', 'Every donation is another song in the queue.', '#b388ff');
+    else if (w.egg === 'adithya') TR.ui.banner('SYSTEMS LEAD MODE', 'Too tuff to stay down. The shield grows back.', '#38d6ff');
+    else if (w.egg === 'olivia') TR.ui.banner('OLIVIA MODE', 'Cross-country pace from the start. Do not stop.', '#9fe8ff');
+    else if (w.halfApps) TR.ui.banner('HALF APPS HOUR', 'It is after 9 PM. Every donation counts double.', '#7dff7a');
+    else TR.ui.banner('HOUR 0', '46 hours. No sitting. No sleeping. Go!', '#38d6ff');
+  };
+
+  // the menu bot was caught sitting down: up it gets
+  G.standUp = function () {
+    const w = G.w;
+    if (!w || !w.attract) return;
+    const p = w.p;
+    p.vy = -540;
+    p.y -= 4;
+    p.onGround = false;
+    p.sy = 1.2;
+    p.sx = 0.86;
+    floatText(w, PX + 8, p.y - 120, '!', '#ffd23f', 56);
   };
 
   G.pause = function () {
