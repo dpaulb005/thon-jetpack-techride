@@ -83,29 +83,52 @@
    *  THE RUNNER
    * ===================================================================== */
   art.SKINS = [
-    { id: 'bolt', name: 'TECHBOT', blurb: 'The original. Held together by duct tape and good intentions.', cost: 0,
+    { id: 'bolt', name: 'TECHBOT', blurb: 'The original. Once cardboard, foil and green tape. Still mostly tape.', cost: 0,
       body: '#a6e22e', bodyLo: '#5f9a12', limb: '#dfe6f2', limbLo: '#8e99b3', pack: '#4a556f', packLo: '#262e45',
       eye: '#4aa8ff', accent: '#4aa8ff', flame: '#38d6ff', flameCore: '#eaffff' },
-    // `kit` picks the bot's gear and face (see the kit* functions below);
-    // `head` recolours the helmet; `sparks` are the exhaust colours.
-    { id: 'ember', name: 'COLD BREW', blurb: 'Hour 30 energy. Runs on caffeine and spite.', cost: 150, kit: 'brew',
-      body: '#ff8a3d', bodyLo: '#c2501a', head: '#7a4a28', headLo: '#2e1a0e',
-      limb: '#f3e3d3', limbLo: '#a58a78', pack: '#4f4450', packLo: '#2a2230',
-      eye: '#ffe066', accent: '#ffe066', flame: '#ffb020', flameCore: '#fff6d6' },
-    { id: 'frost', name: 'ICE BATH', blurb: 'What every pair of feet dreams about at 4 AM. Duck included.', cost: 300, kit: 'ice',
-      body: '#7fd8ff', bodyLo: '#2f86c9', limb: '#f1f7ff', limbLo: '#97a9c7', pack: '#3d5578', packLo: '#1e2c47',
-      eye: '#ffffff', accent: '#c9f2ff', flame: '#9fe8ff', flameCore: '#ffffff', sparks: ['#9fe8ff', '#ffffff'] },
+    // `kit` picks the gear and face (see the kit* functions below). `head`,
+    // `hand`, `leg` and `shoe` recolour those parts, `noVisor` leaves the face
+    // bare (the committee members), `sparks` are the exhaust colours and
+    // `tag` is the label on the Hangar card. `armsOut` holds both hands out in front. `tall` adds leg length and `armsBack` keeps the arms behind the body.
+    { id: 'average', name: 'AVERAGE TECH CAPTAIN', tag: 'STARTER PACK', cost: 100, kit: 'avg',
+      blurb: 'Hoodie, vest, 46 unread messages. Deeply cooked.',
+      body: '#2b2e3a', bodyLo: '#15171e', head: '#e8bd98', headLo: '#cf9c74', hand: '#e8bd98', noVisor: true,
+      limb: '#e3f0a0', limbLo: '#b7cc68', leg: '#262933', legLo: '#14161c', shoe: '#f1c4cc',
+      pack: '#3a4258', packLo: '#1b2031', eye: '#1c1a22', accent: '#e3f0a0', flame: '#cfe86a', flameCore: '#ffffff' },
+    { id: 'brandon', name: 'FINAL BOSS', blurb: 'Tech captain. Dressed for the boardroom, built for the dance floor.', cost: 150, kit: 'brandon',
+      body: '#24448f', bodyLo: '#142a5e', head: '#f2cba6', headLo: '#dba77d', hand: '#f2cba6', noVisor: true,
+      limb: '#2a4c9c', limbLo: '#182f66', pack: '#343c52', packLo: '#181d2c',
+      eye: '#141a33', accent: '#38a3ff', flame: '#5b8cff', flameCore: '#ffffff',
+      sparks: ['#5b8cff', '#bcd6f5', '#ffffff'] },
+    { id: 'dribbler', name: 'THE DRIBBLER', blurb: 'Shirt status: soaked. Cause: his own chin. Smile: undefeated.', cost: 300, kit: 'dribbler',
+      body: '#dde3ee', bodyLo: '#b3bdd0', head: '#f1c9a8', headLo: '#d9a57f', hand: '#f1c9a8', noVisor: true,
+      limb: '#dde3ee', limbLo: '#a9b3c8', leg: '#cbbf9f', legLo: '#9d9276', shoe: '#f4f6fb', tall: 11, armsBack: true,
+      pack: '#3d5578', packLo: '#1e2c47', eye: '#1c1a22', accent: '#9fe8ff', flame: '#9fe8ff', flameCore: '#ffffff',
+      sparks: ['#9fe8ff', '#ffffff'] },
+    { id: 'warrior', name: 'THE WARRIOR', blurb: 'Unbothered. Unblinking. A can in each hand.', cost: 400, kit: 'warrior',
+      body: '#f3f5f9', bodyLo: '#c3c9d8', head: '#b9855a', headLo: '#9a6940', hand: '#b9855a', noVisor: true,
+      limb: '#f3f5f9', limbLo: '#b9bfce', leg: '#23252d', legLo: '#131419', shoe: '#2a2d38', armsOut: true,
+      pack: '#26365f', packLo: '#131c36', eye: '#17130f', accent: '#7fa2ff', flame: '#7fa2ff', flameCore: '#ffffff' },
     { id: 'violet', name: 'GLOW STICK', blurb: 'Cracked, shaken, and ready for the line dance.', cost: 500, kit: 'glow',
       body: '#2a2050', bodyLo: '#0f0a22', limb: '#3df5ff', limbLo: '#b32fc4', pack: '#2b2350', packLo: '#120e26',
       eye: '#ffe93d', accent: '#ff3df2', flame: '#ff3df2', flameCore: '#ffffff',
       sparks: ['#ff3df2', '#3df5ff', '#b6ff3c', '#ffe93d'] },
-    { id: 'stealth', name: 'STAGE CREW', blurb: 'All black. If you can see it, something went wrong.', cost: 800, kit: 'crew',
-      body: '#3a4258', bodyLo: '#1b2031', limb: '#59627a', limbLo: '#2c3347', pack: '#22283a', packLo: '#10141f',
-      eye: '#ff4757', accent: '#ff4757', flame: '#ff6a5c', flameCore: '#ffe9e0' },
+    { id: 'darsh', name: 'MR ACTIVE', tag: 'BEST DRESSED', cost: 800, kit: 'darsh',
+      blurb: 'Knit sweater, pleated trousers, tinted shades. To a dance marathon.',
+      body: '#26272f', bodyLo: '#101116', head: '#b8824f', headLo: '#996538', hand: '#b8824f', noVisor: true,
+      limb: '#2c2d36', limbLo: '#17181e', leg: '#4d505c', legLo: '#2e3038', shoe: '#0d0d11',
+      pack: '#3a3d48', packLo: '#1a1b21', eye: '#17130f', accent: '#e8c36a', flame: '#ffcf6b', flameCore: '#ffffff',
+      sparks: ['#e8c36a', '#ffffff'] },
     { id: 'gold', name: 'TOTAL REVEAL', blurb: 'Solid gold. Funded entirely by spare change.', cost: 1500, kit: 'gold',
       body: '#ffd23f', bodyLo: '#c98a10', limb: '#fff3c4', limbLo: '#b99a4a', pack: '#6b5524', packLo: '#3a2d10',
       eye: '#ffffff', accent: '#fff3a0', flame: '#ffe066', flameCore: '#ffffff',
       sparks: ['#ffd23f', '#fff3a0', '#ffffff', '#ff8fb1'] },
+    { id: 'director', name: 'THE DIRECTOR', tag: 'LEGENDARY', cost: 2500, kit: 'director',
+      blurb: 'The full comfort set, hood up. You are still running the starter pack.',
+      body: '#e3f0a0', bodyLo: '#b7cc68', head: '#f3d0b5', headLo: '#dcaa88', hand: '#f3d0b5', noVisor: true,
+      limb: '#e3f0a0', limbLo: '#b7cc68', shoe: '#1b2440', pack: '#6b5524', packLo: '#3a2d10',
+      eye: '#1c1a22', accent: '#ffd23f', flame: '#ffe066', flameCore: '#ffffff',
+      sparks: ['#e3f0a0', '#ffd23f', '#ffffff'] },
   ];
   art.skin = (id) => art.SKINS.find((s) => s.id === id) || art.SKINS[0];
 
@@ -187,50 +210,326 @@
     ctx.stroke();
   }
 
+  /* ---------- people ----------
+   * Some skins are committee members instead of bots. They share one head;
+   * PERSON[kit] says what goes on it. */
+  const COMFORT = ['#e3f0a0', '#b7cc68']; // the comfort set
+  const PERSON = {
+    avg: { hood: COMFORT, fringe: '#4a3526', brow: '#3a2a1e', eyes: 'tired', mouth: 'flat' },
+    director: { hood: COMFORT, fringe: '#7a5636', brow: '#5d4129', eyes: 'happy', mouth: 'grin', halo: true },
+    dribbler: { hair: '#2a1f1a', messy: true, brow: '#2a1f1a', mouth: 'grin' },
+    darsh: { hair: '#17130f', brow: '#17130f', beard: '#17130f', glasses: 'tint', mouth: 'grin' },
+    warrior: { cap: ['#d5d9e1', '#26365f'], hair: '#17130f', brow: '#17130f', beard: '#17130f', glasses: 'rect',
+      mouth: 'smirk', hoodDown: '#f3f5f9', noBlink: true },
+  };
+
+  function personHeadBack(ctx, P) {
+    if (P.hoodDown) {
+      // the hood, bunched up behind the neck
+      ctx.beginPath();
+      ctx.ellipse(-13, -16.5, 10, 6.5, -0.25, 0, TAU);
+      fillStroke(ctx, P.hoodDown, 2.2);
+    }
+    return true; // people have no antenna
+  }
+
+  // hair, hood or cap; drawn on the bare head before the face
+  function personHeadFront(ctx, skin, P, t) {
+    if (P.hair) {
+      ctx.beginPath();
+      if (P.cap) {
+        // only what shows below the cap
+        ctx.moveTo(-9.5, -27);
+        ctx.quadraticCurveTo(-15, -25, -19.5, -28);
+        ctx.lineTo(-20.5, -40);
+        ctx.lineTo(-7, -40);
+        ctx.lineTo(-7.5, -33);
+      } else {
+        // short at the sides, styled up on top
+        ctx.moveTo(-9.5, -27);
+        ctx.quadraticCurveTo(-15, -25.5, -20, -28.5);
+        ctx.quadraticCurveTo(-23, -36, -21.5, -43);
+        ctx.quadraticCurveTo(-19, -53, -7, -55.5);
+        ctx.quadraticCurveTo(6, -59, 17, -53);
+        ctx.quadraticCurveTo(23.5, -48.5, 21, -42.5);
+        ctx.quadraticCurveTo(15, -46, 7, -45.2);
+        ctx.quadraticCurveTo(0, -44.5, -4, -40.5);
+        ctx.quadraticCurveTo(-7, -37.5, -7.5, -33);
+      }
+      ctx.closePath();
+      fillStroke(ctx, P.hair, 2.2);
+      if (P.messy) {
+        // curls breaking up the top edge
+        for (const c of [[-13.5, -51.5, 5], [-4.5, -55.6, 5.2], [5.5, -56.2, 5], [14, -52.6, 4.6]]) {
+          ctx.beginPath();
+          ctx.arc(c[0], c[1], c[2], 0, TAU);
+          fillStroke(ctx, P.hair, 2.2);
+        }
+        ctx.beginPath();
+        ctx.ellipse(-1, -50.3, 19, 4.3, 0, 0, TAU);
+        ctx.fillStyle = P.hair;
+        ctx.fill();
+      }
+      if (!P.cap) {
+        ctx.strokeStyle = 'rgba(150,140,130,0.4)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(-12, -49);
+        ctx.quadraticCurveTo(-2, -54, 8, -51.5);
+        ctx.stroke();
+      }
+      ctx.beginPath(); // ear
+      ctx.ellipse(-10.5, -30, 2.8, 3.8, 0, 0, TAU);
+      fillStroke(ctx, skin.head, 1.6);
+    }
+    if (P.cap) {
+      ctx.beginPath(); // crown
+      ctx.moveTo(-21, -39.5);
+      ctx.quadraticCurveTo(-22, -55.5, -2, -56);
+      ctx.quadraticCurveTo(18, -56.5, 21.5, -42.5);
+      ctx.closePath();
+      fillStroke(ctx, P.cap[1], 2.2);
+      ctx.beginPath(); // front panel
+      ctx.moveTo(1, -55.9);
+      ctx.quadraticCurveTo(18, -56.5, 21.5, -42.5);
+      ctx.lineTo(1, -41.2);
+      ctx.closePath();
+      fillStroke(ctx, P.cap[0], 1.6);
+      ctx.beginPath(); // brim
+      ctx.moveTo(13, -44.8);
+      ctx.quadraticCurveTo(26, -47, 35, -40.6);
+      ctx.quadraticCurveTo(26, -39.2, 13, -40.6);
+      ctx.closePath();
+      fillStroke(ctx, P.cap[1], 2);
+      dot(ctx, -2, -56, 1.7, P.cap[0]);
+    }
+    if (P.hood) {
+      if (P.fringe) {
+        // a little hair showing at the front
+        ctx.beginPath();
+        ctx.moveTo(-5, -36);
+        ctx.quadraticCurveTo(2, -45.5, 20.5, -43);
+        ctx.quadraticCurveTo(12, -39.5, 5, -39);
+        ctx.quadraticCurveTo(-1, -38.5, -5, -36);
+        ctx.closePath();
+        fillStroke(ctx, P.fringe, 1.6);
+      }
+      ctx.beginPath();
+      ctx.moveTo(2, -15.4);
+      ctx.lineTo(-18, -15);
+      ctx.quadraticCurveTo(-28, -27, -23.5, -42);
+      ctx.quadraticCurveTo(-19, -55, -4, -56);
+      ctx.quadraticCurveTo(11, -57.5, 19.5, -51.5);
+      ctx.quadraticCurveTo(24, -47.5, 21, -43.5);
+      ctx.quadraticCurveTo(12, -46.5, 4, -43.5);
+      ctx.quadraticCurveTo(-4.5, -40, -6.5, -32);
+      ctx.quadraticCurveTo(-7, -21.5, 2, -15.4);
+      ctx.closePath();
+      fillStroke(ctx, vgrad(ctx, -56, -15, P.hood[0], P.hood[1]), 2.2);
+      ctx.strokeStyle = 'rgba(70,90,20,0.35)'; // fold
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.moveTo(-17, -47);
+      ctx.quadraticCurveTo(-22, -34, -15, -19);
+      ctx.stroke();
+      ctx.strokeStyle = 'rgba(255,255,255,0.5)'; // rim
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(2, -41.5);
+      ctx.quadraticCurveTo(-3.5, -38, -4.6, -31.5);
+      ctx.stroke();
+    }
+    if (P.halo) {
+      // legendary
+      const hy = -63 + Math.sin(t * 3) * 0.8;
+      glow(ctx, 0, hy, 22, '#ffd23f', 0.5);
+      ctx.beginPath();
+      ctx.ellipse(0, hy, 12.5, 3.4, -0.06, 0, TAU);
+      tube(ctx, 2, '#ffd23f');
+    }
+  }
+
+  function personEyes(ctx, skin, s, P) {
+    const ink = skin.eye;
+    for (const ex of [1.5, 12]) {
+      if (s.blink && !P.noBlink) {
+        ctx.fillStyle = ink;
+        ctx.fillRect(ex - 2, -32.6, 4, 1.3);
+      } else if (P.eyes === 'happy') {
+        ctx.beginPath();
+        ctx.arc(ex, -30.6, 2.6, Math.PI * 1.1, Math.PI * 1.9);
+        ctx.strokeStyle = ink;
+        ctx.lineWidth = 1.7;
+        ctx.stroke();
+      } else if (P.eyes === 'tired') {
+        dot(ctx, ex, -31.6, 1.8, ink);
+        ctx.fillStyle = skin.head; // heavy lids
+        ctx.fillRect(ex - 2.4, -34, 4.8, 2);
+        ctx.fillStyle = ink;
+        ctx.fillRect(ex - 2.4, -32.4, 4.8, 1.1);
+        ctx.beginPath(); // and the bags to match
+        ctx.arc(ex, -31, 3.4, 0.2 * Math.PI, 0.8 * Math.PI);
+        ctx.strokeStyle = 'rgba(110,60,80,0.5)';
+        ctx.lineWidth = 1.1;
+        ctx.stroke();
+      } else {
+        dot(ctx, ex, -32, 1.7, ink);
+        dot(ctx, ex + 0.6, -32.6, 0.6, '#ffffff');
+      }
+    }
+  }
+
+  // beard, brows, nose, mouth and glasses; drawn over the eyes
+  function personFace(ctx, skin, P) {
+    if (P.beard) {
+      ctx.save();
+      rr(ctx, -17.7, -45.7, 37.4, 28.4, 9.7);
+      ctx.clip();
+      ctx.beginPath();
+      ctx.moveTo(-8.5, -31);
+      ctx.quadraticCurveTo(-6, -23.5, 1, -22.5);
+      ctx.quadraticCurveTo(3.5, -23, 3.8, -27.4);
+      ctx.lineTo(13.6, -27.4);
+      ctx.quadraticCurveTo(14, -23, 16.5, -22.8);
+      ctx.lineTo(22, -24);
+      ctx.lineTo(22, -14);
+      ctx.lineTo(-12, -14);
+      ctx.closePath();
+      ctx.fillStyle = rgba(P.beard, 0.86);
+      ctx.fill();
+      ctx.restore();
+    }
+    ctx.strokeStyle = P.brow;
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.moveTo(-1.6, -37.4);
+    ctx.lineTo(4, -37.8);
+    ctx.moveTo(9.4, -37.8);
+    ctx.lineTo(15, -37.2);
+    ctx.stroke();
+    ctx.strokeStyle = 'rgba(60,30,15,0.5)';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.moveTo(7.6, -29.4);
+    ctx.quadraticCurveTo(9.6, -27.2, 7.4, -26.6);
+    ctx.stroke();
+    if (P.mouth === 'grin') {
+      ctx.beginPath();
+      ctx.moveTo(4.6, -26);
+      ctx.lineTo(12.8, -26);
+      ctx.quadraticCurveTo(12.4, -21, 8.7, -21);
+      ctx.quadraticCurveTo(5, -21, 4.6, -26);
+      ctx.closePath();
+      ctx.fillStyle = '#ffffff';
+      ctx.fill();
+      ctx.strokeStyle = '#4a221c';
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+    } else {
+      ctx.beginPath();
+      if (P.mouth === 'flat') {
+        ctx.moveTo(5.6, -23.4);
+        ctx.lineTo(11.6, -23.4);
+      } else if (P.mouth === 'smirk') {
+        ctx.moveTo(5.4, -23.4);
+        ctx.quadraticCurveTo(9.6, -22.6, 12.6, -24.8);
+      } else ctx.arc(8.5, -24.8, 3.2, 0.2 * Math.PI, 0.8 * Math.PI);
+      ctx.strokeStyle = P.beard ? '#dba391' : '#9c4f42';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+    if (P.glasses) {
+      const tint = P.glasses === 'tint';
+      for (const lx of [-3, 7.5]) {
+        if (tint) rr(ctx, lx - 0.4, -36.4, 9.8, 8.4, 3.6);
+        else rr(ctx, lx, -35.6, 9, 7.2, 2);
+        ctx.fillStyle = tint ? 'rgba(96,52,24,0.62)' : 'rgba(190,225,255,0.2)';
+        ctx.fill();
+        ctx.strokeStyle = tint ? '#1a1410' : '#2c3040';
+        ctx.lineWidth = tint ? 1.5 : 1.25;
+        ctx.stroke();
+      }
+      ctx.beginPath();
+      ctx.moveTo(6, -32.6);
+      ctx.lineTo(7.5, -32.6);
+      ctx.moveTo(-3, -33.2);
+      ctx.lineTo(-9.6, -32);
+      ctx.stroke();
+      if (tint) {
+        ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+        ctx.lineWidth = 1.1;
+        ctx.beginPath();
+        ctx.moveTo(13.6, -34.8);
+        ctx.lineTo(11.6, -31.4);
+        ctx.stroke();
+      }
+    }
+  }
+
+  // a plain drinks can, held at (x, y)
+  function drinkCan(ctx, x, y, col) {
+    rr(ctx, x - 3.6, y - 12.5, 7.2, 14, 1.8);
+    fillStroke(ctx, col, 1.8);
+    ctx.fillStyle = '#d9dde6';
+    ctx.fillRect(x - 2.9, y - 12, 5.8, 1.9);
+    ctx.fillStyle = 'rgba(255,255,255,0.4)';
+    ctx.fillRect(x - 2.3, y - 9, 1.4, 9);
+  }
+
+  // one drop of dribble
+  function bead(ctx, x, y, r) {
+    ctx.beginPath();
+    ctx.moveTo(x, y - 3.6 * r);
+    ctx.quadraticCurveTo(x + 2.8 * r, y + 0.6 * r, x, y + 2 * r);
+    ctx.quadraticCurveTo(x - 2.8 * r, y + 0.6 * r, x, y - 3.6 * r);
+    ctx.fillStyle = '#9fe8ff';
+    ctx.fill();
+    ctx.strokeStyle = OUTLINE;
+    ctx.lineWidth = 1.1;
+    ctx.stroke();
+    dot(ctx, x - 0.6 * r, y - 0.1 * r, 0.5 * r, '#ffffff');
+  }
+  // The Dribbler's shirt: the wet tracks the dribble runs down. Each is
+  // [x, how far down it reaches, wobble phase].
+  const DRIBBLE = [[11.4, 19, 0], [7.4, 14, 1.7], [3.8, 7, 3.1]];
+  const dribbleX = (tr, y) => tr[0] + Math.sin(y * 0.32 + tr[2]) * 1.3;
+
+  function hoodStrings(ctx) {
+    for (const x of [3.6, 8.6]) {
+      ctx.beginPath();
+      ctx.moveTo(x, -13.4);
+      ctx.lineTo(x, -5.4);
+      ctx.strokeStyle = 'rgba(0,0,0,0.35)';
+      ctx.lineWidth = 2.6;
+      ctx.stroke();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+    }
+  }
+
   // drawn over the standard jetpack
   function kitPack(ctx, skin, t) {
     const kit = skin.kit;
-    if (kit === 'brew') {
-      // a steel thermos with a screw cap and a label
-      rr(ctx, -29, -24, 14, 9, 3);
-      fillStroke(ctx, skin.packLo, 2.2);
-      rr(ctx, -31, -18, 18, 32, 7);
-      const mg = ctx.createLinearGradient(-31, 0, -13, 0);
-      mg.addColorStop(0, '#7f8a9c');
-      mg.addColorStop(0.4, '#f1f4f9');
-      mg.addColorStop(1, '#6a7587');
-      fillStroke(ctx, mg);
-      ctx.fillStyle = skin.body;
-      ctx.fillRect(-29.7, -9, 15.4, 9);
-      ctx.fillStyle = 'rgba(0,0,0,0.28)';
-      ctx.fillRect(-29.7, -9, 15.4, 1.2);
-      ctx.fillRect(-29.7, -1.2, 15.4, 1.2);
-    } else if (kit === 'ice') {
-      // snow settled on top
-      ctx.beginPath();
-      ctx.moveTo(-32, -13);
-      ctx.quadraticCurveTo(-32, -21, -24, -21);
-      ctx.lineTo(-19, -21);
-      ctx.quadraticCurveTo(-12, -21, -12, -13);
-      ctx.quadraticCurveTo(-15, -10, -18, -14);
-      ctx.quadraticCurveTo(-22, -9.5, -26, -14);
-      ctx.quadraticCurveTo(-29, -9, -32, -13);
-      ctx.closePath();
-      fillStroke(ctx, '#f4fbff', 2);
+    if (kit === 'brandon') {
+      // a pocket mainframe: blue rack stripes and status lights
+      rr(ctx, -29.5, -16.5, 15, 29, 4);
+      ctx.fillStyle = skin.packLo;
+      ctx.fill();
+      for (let i = 0; i < 4; i++) {
+        const y = -13.5 + i * 6.6;
+        ctx.fillStyle = skin.accent;
+        ctx.fillRect(-28, y, 8.5, 1.3);
+        ctx.fillRect(-28, y + 2.3, 8.5, 1.3);
+        dot(ctx, -17.2, y + 1.8, 1.1, Math.sin(t * 7 + i * 2.3) > 0 ? '#b6ff3c' : '#2c3347');
+      }
     } else if (kit === 'glow') {
       for (let i = 0; i < 3; i++) {
         ctx.fillStyle = neon(t, i);
         ctx.fillRect(-28, -12 + i * 7, 10, 2.6);
       }
       glow(ctx, -22, -4, 20, neon(t, 1), 0.4);
-    } else if (kit === 'crew') {
-      // road case: metal bands and a latch
-      ctx.fillStyle = '#59627a';
-      ctx.fillRect(-29.7, -15.5, 15.4, 2.2);
-      ctx.fillRect(-29.7, 9.3, 15.4, 2.2);
-      rr(ctx, -25.5, 0, 7, 7, 1.6);
-      fillStroke(ctx, '#9aa4b8', 1.5);
-    } else if (kit === 'gold') {
+    } else if (kit === 'gold' || kit === 'director') {
       star4(ctx, -22, 4, 5.2, 2);
       fillStroke(ctx, skin.accent, 1.4);
     }
@@ -244,42 +543,80 @@
       ctx.fillStyle = col || '#0c1430';
       ctx.fill();
     };
-    if (kit === 'brew') {
-      // cardboard sleeve with a coffee bean on it
-      ctx.fillStyle = '#d9a066';
-      ctx.fillRect(-13.7, -5, 27.4, 15);
-      ctx.fillStyle = 'rgba(70,35,10,0.2)';
-      for (let x = -11; x <= 11; x += 3.6) ctx.fillRect(x, -5, 1, 15);
-      ctx.fillStyle = 'rgba(40,20,5,0.55)';
-      ctx.fillRect(-13.7, -5.6, 27.4, 1.3);
-      ctx.fillRect(-13.7, 9.4, 27.4, 1.3);
-      ctx.save();
-      ctx.translate(4, 2.3);
-      ctx.rotate(0.45);
+    if (kit === 'brandon') {
+      // navy suit: shirt, collar and a red tie
       ctx.beginPath();
-      ctx.ellipse(0, 0, 4, 5.6, 0, 0, TAU);
-      fillStroke(ctx, '#4a2a14', 1.6);
-      ctx.beginPath();
-      ctx.moveTo(0.6, -4.4);
-      ctx.bezierCurveTo(-2.4, -1.5, 2.4, 1.5, -0.6, 4.4);
-      ctx.strokeStyle = '#d9a066';
-      ctx.lineWidth = 1.2;
-      ctx.stroke();
-      ctx.restore();
-    } else if (kit === 'ice') {
-      // a slowly turning snowflake
-      panel();
-      ctx.strokeStyle = skin.accent;
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      for (let i = 0; i < 3; i++) {
-        const a = (i / 3) * Math.PI + t * 0.6;
-        const cx = Math.cos(a) * 4.8, cy = Math.sin(a) * 4.8;
-        ctx.moveTo(4.5 - cx, 0.5 - cy);
-        ctx.lineTo(4.5 + cx, 0.5 + cy);
+      ctx.moveTo(-3, -13.6);
+      ctx.lineTo(12.5, -13.6);
+      ctx.lineTo(5, 4);
+      ctx.closePath();
+      fillStroke(ctx, '#bcd6f5', 1.6);
+      for (const c of [[-3, 3.2, 0.6], [12.5, 6.8, 9.4]]) {
+        ctx.beginPath();
+        ctx.moveTo(c[0], -13.6);
+        ctx.lineTo(c[1], -13.6);
+        ctx.lineTo(c[2], -8.8);
+        ctx.closePath();
+        fillStroke(ctx, '#f4f8ff', 1.2);
       }
+      ctx.beginPath();
+      ctx.moveTo(3, -13.6);
+      ctx.lineTo(7, -13.6);
+      ctx.lineTo(6.2, -10.4);
+      ctx.lineTo(7.6, -1.5);
+      ctx.lineTo(5, 2.2);
+      ctx.lineTo(2.4, -1.5);
+      ctx.lineTo(3.8, -10.4);
+      ctx.closePath();
+      fillStroke(ctx, '#d7263d', 1.2);
+      ctx.fillStyle = 'rgba(0,0,0,0.3)';
+      ctx.fillRect(3.8, -10.9, 2.4, 1);
+      // captain's pin
+      star4(ctx, -8.6, -6.4, 3.4, 1.3);
+      fillStroke(ctx, '#ffd23f', 1.2);
+      // work badge with blue stripes
+      ctx.fillStyle = '#59627a';
+      ctx.fillRect(-9.2, 1.4, 2.4, 2.2);
+      rr(ctx, -12.2, 3, 8.4, 10.5, 1.6);
+      fillStroke(ctx, '#f4f8ff', 1.5);
+      ctx.fillStyle = '#1f70c1';
+      for (let i = 0; i < 4; i++) ctx.fillRect(-10.8, 5 + i * 2, 5.6, 1.1);
+    } else if (kit === 'dribbler') {
+      // a pale crewneck with dribble running down it (kitFront draws where it comes from)
+      const wet = 'rgba(58,84,140,0.8)';
+      ctx.save();
+      rr(ctx, -15, -15, 30, 34, 9);
+      ctx.clip();
+      ctx.beginPath(); // the damp patch under the chin
+      ctx.ellipse(8, -12.6, 8.5, 4.4, 0, 0, TAU);
+      ctx.fillStyle = wet;
+      ctx.fill();
+      for (const tr of DRIBBLE) {
+        // the track each trickle has left
+        ctx.beginPath();
+        for (let y = -13; y <= tr[1]; y += 2) ctx.lineTo(dribbleX(tr, y), y);
+        ctx.strokeStyle = wet;
+        ctx.lineWidth = 3.4;
+        ctx.stroke();
+      }
+      DRIBBLE.forEach((tr, i) => {
+        // and the drops sliding down it
+        for (let b = 0; b < 2; b++) {
+          const k = (t * (0.5 + i * 0.13) + b * 0.5 + i * 0.3) % 1;
+          const y = -12 + k * (tr[1] + 12);
+          bead(ctx, dribbleX(tr, y), y, 1);
+        }
+      });
+      ctx.restore();
+      rr(ctx, -15, -15, 30, 34, 9);
+      ctx.strokeStyle = OUTLINE;
+      ctx.lineWidth = 2.5;
       ctx.stroke();
-      dot(ctx, 4.5, 0.5, 1.4, '#ffffff');
+      ctx.beginPath();
+      ctx.ellipse(4, -13.6, 6.5, 3.6, 0, 0.2, Math.PI - 0.2);
+      ctx.strokeStyle = '#d9dde6';
+      ctx.lineWidth = 1.1;
+      ctx.stroke();
     } else if (kit === 'glow') {
       // neon piping, an equaliser that bounces to the music, a glow necklace
       rr(ctx, -10.5, -9, 21, 23.5, 6);
@@ -295,36 +632,80 @@
       ctx.beginPath();
       ctx.ellipse(1, -14, 10, 5.5, 0, 0.2, Math.PI - 0.2);
       tube(ctx, 2.2, neon(t, 2));
-    } else if (kit === 'crew') {
-      // a roll of gaffer tape on the hip, a backstage pass on a lanyard
+    } else if (kit === 'avg') {
+      // the starter pack: a black puffer vest, unzipped over the hoodie
+      ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+      ctx.lineWidth = 1.1;
       ctx.beginPath();
-      ctx.arc(-8.5, 12.5, 4.4, 0, TAU);
-      fillStroke(ctx, '#8e99b3', 1.8);
-      dot(ctx, -8.5, 12.5, 1.7, OUTLINE);
-      const sw = -vyN * 2.5 + Math.sin(t * 5) * 0.6;
-      ctx.beginPath();
-      ctx.moveTo(-6, -14);
-      ctx.lineTo(3.5 + sw, -1);
-      ctx.lineTo(10, -14);
-      ctx.strokeStyle = skin.accent;
-      ctx.lineWidth = 1.5;
+      for (let y = -8; y <= 11; y += 6.2) {
+        ctx.moveTo(-13.6, y);
+        ctx.lineTo(13.6, y);
+      }
       ctx.stroke();
-      rr(ctx, -1 + sw, -2, 9, 11.5, 1.8);
-      fillStroke(ctx, '#f4f6fb', 1.6);
-      ctx.fillStyle = skin.accent;
-      ctx.fillRect(sw, -1, 7, 3.2);
-      ctx.fillStyle = '#59627a';
-      ctx.fillRect(0.6 + sw, 4, 5.8, 1.1);
-      ctx.fillRect(0.6 + sw, 6.3, 4, 1.1);
+      ctx.beginPath();
+      ctx.moveTo(0, -13.7);
+      ctx.lineTo(12, -13.7);
+      ctx.lineTo(10.2, 17.7);
+      ctx.lineTo(2, 17.7);
+      ctx.closePath();
+      fillStroke(ctx, skin.limb, 1.6);
+      hoodStrings(ctx);
+    } else if (kit === 'director' || kit === 'warrior') {
+      // hoodie: front pocket and drawstrings
+      ctx.beginPath();
+      ctx.moveTo(-8, 6.5);
+      ctx.lineTo(10, 6.5);
+      ctx.lineTo(12.8, 17.4);
+      ctx.lineTo(-10.8, 17.4);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(0,0,0,0.07)';
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+      ctx.lineWidth = 1.3;
+      ctx.stroke();
+      hoodStrings(ctx);
+    } else if (kit === 'darsh') {
+      // ribbed knit, a thin chain and a good belt
+      ctx.save();
+      rr(ctx, -15, -15, 30, 34, 9);
+      ctx.clip();
+      ctx.strokeStyle = 'rgba(255,255,255,0.09)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (let x = -11; x <= 11.5; x += 3.2) {
+        ctx.moveTo(x, -13);
+        ctx.lineTo(x, 12.6);
+      }
+      ctx.stroke();
+      ctx.fillStyle = '#6b4226';
+      ctx.fillRect(-15, 12.6, 30, 4.2);
+      ctx.fillStyle = 'rgba(0,0,0,0.35)';
+      ctx.fillRect(-15, 12.6, 30, 0.9);
+      ctx.fillStyle = skin.leg;
+      ctx.fillRect(-15, 16.8, 30, 3);
+      ctx.restore();
+      rr(ctx, -15, -15, 30, 34, 9);
+      ctx.strokeStyle = OUTLINE;
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+      rr(ctx, 1.5, 12.1, 6, 5.2, 1.2);
+      ctx.strokeStyle = '#d9dde6';
+      ctx.lineWidth = 1.4;
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.ellipse(4, -13.4, 6.5, 4.4, 0, 0.2, Math.PI - 0.2);
+      ctx.lineWidth = 1.1;
+      ctx.stroke();
     } else if (kit === 'gold') {
       // a donation slot, with a coin forever dropping in
       const k = (t * 1.2) % 1;
       panel('#2a1c05');
-      ctx.globalAlpha = Math.min(1, k * 5);
+      const ga = ctx.globalAlpha;
+      ctx.globalAlpha = ga * Math.min(1, k * 5);
       ctx.beginPath();
       ctx.arc(4.5, -3.4 + k * 6, 3, 0, TAU);
       fillStroke(ctx, skin.accent, 1.3);
-      ctx.globalAlpha = 1;
+      ctx.globalAlpha = ga;
       ctx.fillStyle = '#2a1c05';
       ctx.fillRect(0.5, 3.4, 8.5, 2.8);
       ctx.fillStyle = '#000000';
@@ -363,21 +744,7 @@
   // drawn behind the helmet; returns true when it stands in for the antenna
   function kitHeadBack(ctx, skin, t, ant) {
     const kit = skin.kit;
-    if (kit === 'brew') {
-      // bendy straw
-      ctx.beginPath();
-      ctx.moveTo(-5, -44);
-      ctx.lineTo(-8 - ant * 0.7, -59);
-      ctx.lineTo(1 - ant, -64.5);
-      tube(ctx, 4, '#fff7ea');
-      ctx.setLineDash([3, 3.6]);
-      ctx.lineCap = 'butt';
-      ctx.strokeStyle = skin.body;
-      ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.lineCap = 'round';
-      return true;
-    }
+    if (PERSON[kit]) return personHeadBack(ctx, PERSON[kit]);
     if (kit === 'glow') {
       // a pair of glow sticks
       for (const g of [[-9, -15, -62, 0], [7, 13, -60, 2]]) {
@@ -393,26 +760,40 @@
       }
       return true;
     }
-    return kit === 'ice' || kit === 'crew' || kit === 'gold';
+    return kit === 'brandon' || kit === 'gold';
   }
 
   // drawn on the helmet, under the visor
-  function kitHeadFront(ctx, skin, ant) {
+  function kitHeadFront(ctx, skin, t, ant) {
     const kit = skin.kit;
-    if (kit === 'brew') {
-      // the head is a cup of cold brew: ice cubes and a lid
-      for (const c of [[-17, -41.5, 7.5], [-16.6, -30, 6.4]]) {
-        rr(ctx, c[0], c[1], c[2], c[2], 1.8);
-        ctx.fillStyle = 'rgba(255,255,255,0.3)';
-        ctx.fill();
-        ctx.strokeStyle = 'rgba(255,255,255,0.55)';
-        ctx.lineWidth = 1;
-        ctx.stroke();
-      }
-      rr(ctx, -21, -50.5, 44, 7, 3.2);
-      fillStroke(ctx, skin.limb, 2.2);
-      ctx.fillStyle = 'rgba(0,0,0,0.14)';
-      ctx.fillRect(-19, -46.4, 40, 1.3);
+    if (PERSON[kit]) return personHeadFront(ctx, skin, PERSON[kit], t);
+    if (kit === 'brandon') {
+      // dark hair with some height, swept across the forehead
+      ctx.beginPath();
+      ctx.moveTo(-21, -23);
+      ctx.quadraticCurveTo(-25, -32, -22.5, -42);
+      ctx.quadraticCurveTo(-21, -53, -9, -55);
+      ctx.quadraticCurveTo(-3, -57.5, 3, -54.5);
+      ctx.quadraticCurveTo(12, -57, 19, -51);
+      ctx.quadraticCurveTo(24.5, -46, 21.5, -39.5);
+      ctx.quadraticCurveTo(18, -44, 10, -43.5);
+      ctx.quadraticCurveTo(3, -43.5, -2, -40);
+      ctx.quadraticCurveTo(-6, -38.5, -7.5, -33);
+      ctx.lineTo(-9.5, -27);
+      ctx.quadraticCurveTo(-13, -29, -14, -23.5);
+      ctx.closePath();
+      fillStroke(ctx, '#15161f', 2.2);
+      ctx.strokeStyle = 'rgba(125,135,175,0.5)';
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.moveTo(-14, -48);
+      ctx.quadraticCurveTo(-4, -52.5, 4, -49.5);
+      ctx.moveTo(8, -50);
+      ctx.quadraticCurveTo(14, -50.5, 18, -46.5);
+      ctx.stroke();
+      ctx.beginPath(); // ear
+      ctx.ellipse(-10.5, -30, 2.8, 3.8, 0, 0, TAU);
+      fillStroke(ctx, skin.head, 1.6);
     } else if (kit === 'gold') {
       // crown, worn at an angle
       ctx.save();
@@ -455,39 +836,19 @@
   function kitEyes(ctx, skin, s, t) {
     const kit = skin.kit;
     if (!kit) return false;
+    if (PERSON[kit]) return personEyes(ctx, skin, s, PERSON[kit]), true;
     const shut = (c) => {
       ctx.fillStyle = c;
       ctx.fillRect(-1.5, -32.8, 6, 1.6);
       ctx.fillRect(8.5, -32.8, 6, 1.6);
     };
-    if (kit === 'brew') {
-      // wide awake, one eye more than the other, pupils buzzing
-      glow(ctx, 6.5, -32, 17, skin.eye, 0.5);
+    if (kit === 'brandon') {
+      // one ordinary eye, one upgrade (the glasses go on in kitHeadOver)
       if (s.blink) return shut(skin.eye), true;
-      const jx = Math.sin(t * 47) * 0.7, jy = Math.cos(t * 53) * 0.6;
-      for (const e of [[1, -32, 4.1], [12, -32.4, 5]]) {
-        dot(ctx, e[0], e[1], e[2], skin.eye);
-        dot(ctx, e[0] + 0.8 + jx, e[1] + jy, 1.5, '#0a1230');
-        ctx.beginPath();
-        ctx.arc(e[0], e[1], e[2] + 1.9, 0.7, 2.44);
-        ctx.strokeStyle = rgba(skin.eye, 0.4);
-        ctx.lineWidth = 1.1;
-        ctx.stroke();
-      }
-    } else if (kit === 'ice') {
-      // half-lidded and completely relaxed
-      glow(ctx, 6.5, -32, 16, skin.eye, 0.5);
-      if (s.blink) return shut(skin.eye), true;
-      ctx.fillStyle = skin.eye;
-      rr(ctx, -1.5, -36.5, 6, 9, 2.6);
-      ctx.fill();
-      rr(ctx, 8.5, -36.5, 6, 9, 2.6);
-      ctx.fill();
-      ctx.fillStyle = '#0a1230';
-      ctx.fillRect(-2.5, -37, 18, 4.6);
-      ctx.fillStyle = skin.accent;
-      ctx.fillRect(-2.2, -32.8, 7.4, 1.1);
-      ctx.fillRect(7.8, -32.8, 7.4, 1.1);
+      dot(ctx, 1.5, -32, 1.7, skin.eye);
+      glow(ctx, 12, -32, 9, skin.accent, 0.8);
+      dot(ctx, 12, -32, 2.1, skin.accent);
+      dot(ctx, 12, -32, 0.9, '#ffffff');
     } else if (kit === 'glow') {
       // neon rings
       const c = neon(t, 3);
@@ -499,18 +860,6 @@
         ctx.beginPath();
         ctx.arc(ex, -32, 3.5, 0, TAU);
         ctx.stroke();
-      }
-    } else if (kit === 'crew') {
-      // one red light, sweeping
-      rr(ctx, -4, -34.5, 19, 5, 2.4);
-      ctx.fillStyle = rgba(skin.eye, 0.28);
-      ctx.fill();
-      if (!s.blink) {
-        const x = 5.5 + Math.sin(t * 4.2) * 6.3;
-        glow(ctx, x, -32, 13, skin.eye, 0.8);
-        rr(ctx, x - 3.2, -34.5, 6.4, 5, 2.4);
-        ctx.fillStyle = skin.eye;
-        ctx.fill();
       }
     } else if (kit === 'gold') {
       // stars in its eyes
@@ -529,49 +878,55 @@
   // drawn over the finished head
   function kitHeadOver(ctx, skin, t, ant) {
     const kit = skin.kit;
-    if (kit === 'ice') {
-      // a cap of snow, and the bath's rubber duck
-      ctx.save();
-      ctx.translate(-5 - ant * 0.5, -53.4 + Math.sin(t * 5) * 0.5);
-      ctx.rotate(-ant * 0.03);
+    if (kit === 'brandon') {
+      // eyebrows, nose and a small smile
+      ctx.strokeStyle = '#15161f';
+      ctx.lineWidth = 1.5;
       ctx.beginPath();
-      ctx.moveTo(-5.5, -1);
-      ctx.lineTo(-10, -5);
-      ctx.lineTo(-3.5, -3.4);
-      ctx.closePath();
-      fillStroke(ctx, '#ffd23f', 1.8);
+      ctx.moveTo(-1.6, -37.6);
+      ctx.lineTo(4, -38);
+      ctx.moveTo(9.4, -38);
+      ctx.lineTo(15, -37.4);
+      ctx.stroke();
+      ctx.strokeStyle = 'rgba(120,70,40,0.55)';
+      ctx.lineWidth = 1.2;
       ctx.beginPath();
-      ctx.ellipse(0, 0, 7, 4.6, 0, 0, TAU);
-      fillStroke(ctx, '#ffd23f', 1.8);
-      ctx.beginPath();
-      ctx.moveTo(7.6, -6);
-      ctx.lineTo(11.8, -4.5);
-      ctx.lineTo(7.6, -3.2);
-      ctx.closePath();
-      fillStroke(ctx, '#ff8a3d', 1.3);
-      ctx.beginPath();
-      ctx.arc(4.5, -5, 3.7, 0, TAU);
-      fillStroke(ctx, '#ffd23f', 1.8);
-      dot(ctx, 5.5, -5.8, 0.9, OUTLINE);
-      ctx.restore();
-      ctx.beginPath();
-      ctx.moveTo(-20, -36);
-      ctx.quadraticCurveTo(-20, -49.5, -8, -49.5);
-      ctx.lineTo(10, -49.5);
-      ctx.quadraticCurveTo(22, -49.5, 22, -37);
-      ctx.quadraticCurveTo(19, -33.5, 16, -38.5);
-      ctx.quadraticCurveTo(12, -43, 8, -39.5);
-      ctx.quadraticCurveTo(4, -36.5, 0, -40);
-      ctx.quadraticCurveTo(-4, -43, -8, -39);
-      ctx.quadraticCurveTo(-11, -33, -14, -36.5);
-      ctx.quadraticCurveTo(-17, -31, -20, -36);
-      ctx.closePath();
-      fillStroke(ctx, '#f4fbff', 2.2);
-      ctx.strokeStyle = 'rgba(47,134,201,0.3)';
+      ctx.moveTo(7.6, -29.4);
+      ctx.quadraticCurveTo(9.6, -27.2, 7.4, -26.6);
+      ctx.stroke();
+      ctx.strokeStyle = '#9c4f42';
       ctx.lineWidth = 1.4;
       ctx.beginPath();
-      ctx.moveTo(-14, -44);
-      ctx.quadraticCurveTo(-4, -47, 8, -45.5);
+      ctx.arc(8.5, -24.8, 3.2, 0.2 * Math.PI, 0.8 * Math.PI);
+      ctx.stroke();
+      // circuit traces down the cheek, under the upgraded eye
+      ctx.strokeStyle = rgba(skin.accent, 0.9);
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(16.4, -28);
+      ctx.lineTo(18, -26.2);
+      ctx.lineTo(18, -23.2);
+      ctx.lineTo(15, -20.6);
+      ctx.moveTo(18, -24.8);
+      ctx.lineTo(15.4, -24.8);
+      ctx.stroke();
+      dot(ctx, 15, -20.6, 1.1, skin.accent);
+      dot(ctx, 15.4, -24.8, 1, skin.accent);
+      glow(ctx, 17, -24, 8, skin.accent, 0.35 + 0.2 * Math.sin(t * 4));
+      // thin rectangular glasses
+      for (const lx of [-3, 7.5]) {
+        rr(ctx, lx, -35.6, 9, 7.2, 2);
+        ctx.fillStyle = 'rgba(190,225,255,0.2)';
+        ctx.fill();
+        ctx.strokeStyle = '#2c3040';
+        ctx.lineWidth = 1.25;
+        ctx.stroke();
+      }
+      ctx.beginPath();
+      ctx.moveTo(6, -32.6);
+      ctx.lineTo(7.5, -32.6);
+      ctx.moveTo(-3, -33.2);
+      ctx.lineTo(-9.6, -32);
       ctx.stroke();
     } else if (kit === 'glow') {
       // glowing visor rim
@@ -579,47 +934,21 @@
       ctx.strokeStyle = neon(t, 1);
       ctx.lineWidth = 1.6;
       ctx.stroke();
-    } else if (kit === 'crew') {
-      // headset: band, radio stub, ear cup and a boom mic
-      ctx.beginPath();
-      ctx.moveTo(-19, -36);
-      ctx.quadraticCurveTo(-19, -49.5, -5, -49.5);
-      tube(ctx, 3.4, '#59627a');
-      ctx.beginPath();
-      ctx.moveTo(-22, -37);
-      ctx.lineTo(-24.5 - ant * 0.5, -47.5);
-      tube(ctx, 1.8, '#59627a');
-      dot(ctx, -24.5 - ant * 0.5, -47.5, 2, skin.accent);
-      rr(ctx, -25.5, -38.5, 12.5, 15.5, 4.5);
-      fillStroke(ctx, skin.pack, 2.2);
-      dot(ctx, -19.2, -30.6, 1.7, skin.accent);
-      glow(ctx, -19.2, -30.6, 7, skin.accent, 0.7);
-      ctx.beginPath();
-      ctx.moveTo(-17, -24);
-      ctx.quadraticCurveTo(-8, -17, 10, -19.5);
-      tube(ctx, 1.8, '#8e99b3');
-      ctx.beginPath();
-      ctx.arc(11.5, -19.6, 3.1, 0, TAU);
-      fillStroke(ctx, skin.packLo, 1.8);
+    } else if (PERSON[kit]) {
+      personFace(ctx, skin, PERSON[kit]);
     }
   }
 
   // something to hold; drawn just before the near hand
   function kitHand(ctx, skin, t, hx, hy) {
     const kit = skin.kit;
-    if (kit === 'brew') {
-      // a cup for the road
-      ctx.beginPath();
-      ctx.moveTo(hx - 1, hy - 9);
-      ctx.lineTo(hx + 9, hy - 9);
-      ctx.lineTo(hx + 7.6, hy + 3);
-      ctx.lineTo(hx + 0.4, hy + 3);
-      ctx.closePath();
-      fillStroke(ctx, '#fff7ea', 1.8);
-      ctx.fillStyle = '#d9a066';
-      ctx.fillRect(hx + 0.5, hy - 5.6, 7, 4.8);
-      rr(ctx, hx - 2, hy - 11.6, 12, 3.6, 1.4);
-      fillStroke(ctx, skin.pack, 1.6);
+    if (kit === 'brandon') {
+      // never without the laptop
+      rr(ctx, hx - 2, hy - 8.5, 13, 10, 1.8);
+      fillStroke(ctx, '#aeb7c8', 1.8);
+      dot(ctx, hx + 4.5, hy - 3.6, 1.5, skin.accent);
+      ctx.fillStyle = 'rgba(0,0,0,0.25)';
+      ctx.fillRect(hx - 0.8, hy - 0.4, 10.6, 1);
     } else if (kit === 'glow') {
       const c = neon(t, 1);
       ctx.beginPath();
@@ -627,33 +956,24 @@
       ctx.lineTo(hx + 7, hy - 11);
       tube(ctx, 3.4, c);
       glow(ctx, hx + 3, hy - 4, 14, c, 0.6);
-    } else if (kit === 'crew') {
-      // pocket torch
-      const prev = ctx.globalCompositeOperation;
-      const g = ctx.createLinearGradient(hx + 11, 0, hx + 42, 0);
-      g.addColorStop(0, 'rgba(255,243,196,0.3)');
-      g.addColorStop(1, 'rgba(255,243,196,0)');
-      ctx.globalCompositeOperation = 'lighter';
-      ctx.beginPath();
-      ctx.moveTo(hx + 11, hy - 2.5);
-      ctx.lineTo(hx + 42, hy - 12);
-      ctx.lineTo(hx + 42, hy + 12);
-      ctx.lineTo(hx + 11, hy + 2.5);
-      ctx.closePath();
-      ctx.fillStyle = g;
-      ctx.fill();
-      ctx.globalCompositeOperation = prev;
-      rr(ctx, hx, hy - 2.6, 10, 5.2, 1.6);
-      fillStroke(ctx, skin.limb, 1.8);
-      ctx.fillStyle = '#fff3c4';
-      ctx.fillRect(hx + 9.2, hy - 3.2, 2.2, 6.4);
+    } else if (kit === 'warrior') {
+      // one of the two cans
+      drinkCan(ctx, hx, hy, '#ffd23f');
+    } else if (kit === 'avg') {
+      // the group chat never sleeps
+      rr(ctx, hx + 1, hy - 10, 7.5, 13, 1.8);
+      fillStroke(ctx, '#15161f', 1.6);
+      ctx.fillStyle = '#9fe8ff';
+      ctx.fillRect(hx + 2.2, hy - 8.6, 5.1, 9.4);
+      glow(ctx, hx + 4.8, hy - 4, 11, '#9fe8ff', 0.45);
+      dot(ctx, hx + 8.3, hy - 9.8, 1.9, '#ffb020');
     }
   }
 
   // drawn last, over the whole bot
   function kitFront(ctx, skin, t) {
     const kit = skin.kit;
-    if (kit === 'gold') {
+    if (kit === 'gold' || kit === 'director') {
       // it twinkles
       const pts = [[-22, -40], [25, -22], [16, 12], [-13, 5], [13, -56]];
       for (let i = 0; i < pts.length; i++) {
@@ -664,12 +984,49 @@
         ctx.fillStyle = '#ffffff';
         ctx.fill();
       }
-    } else if (kit === 'ice') {
-      // you can see its breath
-      const k = (t * 0.8) % 1;
-      const a = 0.42 * (1 - k);
-      dot(ctx, 25 + k * 12, -24 - k * 5, 2 + k * 3.5, 'rgba(255,255,255,' + a + ')');
-      dot(ctx, 28 + k * 15, -21 - k * 2, 1.5 + k * 2.6, 'rgba(255,255,255,' + a * 0.8 + ')');
+    } else if (kit === 'darsh') {
+      // the fit catches the light
+      const k = Math.sin(t * 2.4);
+      if (k > 0.05) {
+        star4(ctx, 18.5, -38.5, 5.2 * k, 1.2 * k);
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
+      }
+    } else if (kit === 'dribbler') {
+      // where it comes from: a stream out of the corner of the mouth and over the chin
+      const ga = ctx.globalAlpha;
+      ctx.beginPath();
+      for (let y = -23.4; y <= -13.4; y += 1.25) {
+        const d = y + 23.4;
+        ctx.lineTo(12.8 + d * 0.06 + Math.sin(y * 0.8 - t * 9) * d * 0.07, y);
+      }
+      ctx.strokeStyle = OUTLINE;
+      ctx.lineWidth = 3.8;
+      ctx.stroke();
+      ctx.strokeStyle = '#9fe8ff';
+      ctx.lineWidth = 2 + Math.sin(t * 7) * 0.35;
+      ctx.stroke();
+      for (let b = 0; b < 2; b++) {
+        // drops running down the stream
+        const k = (t * 1.5 + b * 0.5) % 1;
+        bead(ctx, 12.9 + k * 0.6, -22.6 + k * 9, 0.85);
+      }
+      // a drop swells at the chin, lets go, and lands on the shirt
+      const c = (t * 0.75) % 1;
+      if (c < 0.55) bead(ctx, 13.5, -13 + c * 2.4, 0.6 + c * 2.2);
+      else {
+        const f = (c - 0.55) / 0.45;
+        ctx.globalAlpha = ga * (1 - f * f);
+        bead(ctx, 13.5, -11.6 + f * f * 26, 1.8);
+        ctx.globalAlpha = ga;
+      }
+      for (let i = 0; i < 2; i++) {
+        // and it keeps going, off the hem
+        const k = (t * 1.1 + i * 0.5) % 1;
+        ctx.globalAlpha = ga * (1 - k * 0.6);
+        bead(ctx, [11.4, 7.4][i], 21 + k * k * 24, 1.15);
+      }
+      ctx.globalAlpha = ga;
     }
   }
 
@@ -697,6 +1054,10 @@
     ctx.translate(s.x, s.y);
     ctx.rotate(s.rot || 0);
     ctx.scale(sc * (s.sx || 1), sc * (s.sy || 1));
+    // a tall skin has longer legs: the feet stay where they are and
+    // everything above the hips moves up
+    const tall = U ? 0 : skin.tall || 0;
+    if (tall) ctx.translate(0, -tall);
     ctx.lineJoin = 'round';
     ctx.lineCap = 'round';
 
@@ -747,7 +1108,7 @@
     };
     const drawLeg = (hx, p, i, col) => {
       const f = legPos(p, i);
-      const fx = hx + f[0], fy = 17 + f[1];
+      const fx = hx + f[0], fy = 17 + f[1] + tall;
       limb(ctx, hx, 17, fx, fy, 4, U ? 9.5 : 7.5, col);
       if (U) {
         // knee guard
@@ -763,15 +1124,22 @@
         ctx.fillRect(fx - 6, fy - 5, 13, 2);
       } else {
         rr(ctx, fx - 6, fy - 3.5, 15, 8, 4);
-        fillStroke(ctx, skin.pack, 2.2);
+        fillStroke(ctx, skin.shoe || skin.pack, 2.2);
       }
     };
     const armPos = (p, front) => {
+      // some skins hold both hands out in front instead of swinging them
+      if (!U && skin.armsOut) return front ? [11, 8 - vyN * 2 + Math.sin(t * 5) * 0.5] : [21, 3 - vyN * 2 + Math.sin(t * 5 + 1) * 0.5];
+      // ...and some hold them back, which keeps the shirt front in view
+      if (!U && skin.armsBack) {
+        const sw = Math.sin(p) * 3 * g;
+        return front ? [-9 + sw, 12 - vyN * 2] : [-5 - sw, 11 - vyN * 2];
+      }
       const gx = Math.sin(p) * 9, gy = 15 - Math.abs(Math.sin(p)) * 2;
       const ax = front ? 13 + th * 2 : 9, ay = front ? 7 - vyN * 3 : 10 - vyN * 2;
       return [lerp(ax, gx, g), lerp(ay, gy, g)];
     };
-    drawLeg(-5, ph + Math.PI, 0, skin.limbLo);
+    drawLeg(-5, ph + Math.PI, 0, skin.legLo || skin.limbLo);
     {
       const a = armPos(ph, false);
       limb(ctx, -1, -7, -1 + a[0], -7 + a[1], -3, U ? 8 : 6, skin.limbLo);
@@ -779,6 +1147,12 @@
         ctx.beginPath();
         ctx.arc(-1 + a[0], -7 + a[1], 6, 0, TAU);
         fillStroke(ctx, skin.trimLo, 2.2);
+      } else if (skin.kit === 'warrior') {
+        // the other can, in the far hand
+        drinkCan(ctx, -1 + a[0], -7 + a[1], '#3f6fe0');
+        ctx.beginPath();
+        ctx.arc(-1 + a[0], -7 + a[1], 4.4, 0, TAU);
+        fillStroke(ctx, skin.headLo, 2.2);
       }
     }
 
@@ -900,9 +1274,11 @@
       glow(ctx, ax - ant, top - 1, 11, skin.accent, 0.8);
     }
     // ear
-    ctx.beginPath();
-    ctx.arc(-18, -31, U ? 6.5 : 5, 0, TAU);
-    fillStroke(ctx, U ? skin.trim : skin.limbLo, 2.2);
+    if (U || !skin.noVisor) {
+      ctx.beginPath();
+      ctx.arc(-18, -31, U ? 6.5 : 5, 0, TAU);
+      fillStroke(ctx, U ? skin.trim : skin.limbLo, 2.2);
+    }
     if (U) {
       ctx.beginPath();
       ctx.arc(-18, -31, 2.2, 0, TAU);
@@ -949,16 +1325,18 @@
       ctx.strokeStyle = 'rgba(255,255,255,0.5)';
       ctx.lineWidth = 2.4;
       ctx.stroke();
-      kitHeadFront(ctx, skin, ant);
+      kitHeadFront(ctx, skin, t, ant);
     }
     // visor
-    if (U) rr(ctx, -8, -39, 27, 14, 5);
-    else rr(ctx, -8, -41, 27, 18, 7);
-    ctx.fillStyle = U ? '#05080f' : '#0a1230';
-    ctx.fill();
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = OUTLINE;
-    ctx.stroke();
+    if (U || !skin.noVisor) {
+      if (U) rr(ctx, -8, -39, 27, 14, 5);
+      else rr(ctx, -8, -41, 27, 18, 7);
+      ctx.fillStyle = U ? '#05080f' : '#0a1230';
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = OUTLINE;
+      ctx.stroke();
+    }
     // eyes
     if (s.dead) {
       ctx.strokeStyle = skin.eye;
@@ -1045,7 +1423,7 @@
     }
 
     // --- near leg + arm ---
-    drawLeg(6, ph, 1, skin.limb);
+    drawLeg(6, ph, 1, skin.leg || skin.limb);
     {
       const a = armPos(ph + Math.PI, true);
       const hx = 2 + a[0], hy = -6 + a[1];
@@ -1068,7 +1446,7 @@
         kitHand(ctx, skin, t, hx, hy);
         ctx.beginPath();
         ctx.arc(hx, hy, 4.6, 0, TAU);
-        fillStroke(ctx, skin.pack, 2.2);
+        fillStroke(ctx, skin.hand || skin.pack, 2.2);
       }
     }
     if (!U && !s.dead) kitFront(ctx, skin, t);
@@ -2481,7 +2859,8 @@
         g.fill();
       }
 
-    const signs = ['NO SITTING', 'NO SLEEPING', 'TECH HQ', 'HYDRATE', 'SNACKS', 'TECH CREW', 'STAY UP', 'DANCE'];
+    const signs = ['NO SITTING', 'NO SLEEPING', 'TECH HQ', 'HYDRATE', 'SNACKS', 'TECH CREW', 'STAY UP', 'DANCE',
+      'HALF APPS', 'ASK SASHA', 'ASK CLAUDE', 'FIT CHECK', 'SO COOKED', 'COMFORT SET'];
     for (let bay = 0; bay < 2; bay++) {
       const bx = bay * 800;
       const wx = bx + 140, wy = 142, ww = 620, wh = 388;

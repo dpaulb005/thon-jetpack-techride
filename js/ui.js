@@ -13,10 +13,11 @@
   let clock = 0;
 
   const CAUSES = {
-    gate: ['TRIPPED ON A LIVE CABLE', 'CABLE MANAGEMENT 1, ROBOT 0', 'WHO LEFT THAT PLUGGED IN?'],
-    drone: ['PHOTOBOMBED BY A DRONE', 'THE LIVESTREAM GOT YOU'],
-    missile: ['MERCH MISSILE TO THE FACE', 'FREE T-SHIRT! (AT 60 MPH)'],
-    laser: ['YOU JOINED THE LASER SHOW', 'THE LIGHTING CREW SAYS SORRY'],
+    gate: ['TRIPPED ON A LIVE CABLE', 'CABLE MANAGEMENT 1, ROBOT 0', 'WHO LEFT THAT PLUGGED IN?',
+      'SASHA SAID NOT TO TOUCH THAT', 'CLAUDE WROTE THAT CABLE'],
+    drone: ['PHOTOBOMBED BY A DRONE', 'THE LIVESTREAM GOT YOU', 'DARSH DODGES THOSE IN STYLE', 'SAY HI TO SASHA ON STREAM'],
+    missile: ['MERCH MISSILE TO THE FACE', 'FREE T-SHIRT! (AT 60 MPH)', 'COOKED. MICHELLE CALLED IT.'],
+    laser: ['YOU JOINED THE LASER SHOW', 'THE LIGHTING CREW SAYS SORRY', 'AIDAN: "CLAUDE CAN FIX THIS"'],
   };
   const TIPS = [
     'No sitting. No sleeping. No unplugging the robot.',
@@ -26,14 +27,33 @@
     'Hydrate. Yes, even you, robot.',
     'If it glows red, it was probably our fault.',
     '46 hours. Zero chairs. One jetpack.',
+    'Aidan says: just ask Claude.',
+    'Written by a robot, about a robot. Aidan could not be happier.',
+    'Darsh dressed better than you today. Darsh always does.',
+    'Sasha did not approve this tip.',
+    'Michelle cannot help right now. Michelle is cooked.',
+    "After this: Applebee's. Half apps wait for no one.",
+    'The comfort set is not an outfit. It is a uniform.',
+    'Respect The Warrior.',
+    'The Warrior has not blinked since hour one.',
+    'The first TECHBOT was cardboard, foil and green tape. It still runs.',
+    'Legendary skin: the full comfort set. Starter pack: just the hoodie.',
+    'For the table: pretzels, boneless wings, wonton tacos. All of them.',
+    'The Final Boss has entered the dance floor. He brought a laptop.',
   ];
   const pickOne = (a) => a[Math.floor(Math.random() * a.length)];
+  // results line: [hours below this, the options]
+  const HOUR_QUIPS = [
+    [2, ['The opening ceremony lasted longer.', 'Michelle lasted longer, and Michelle is cooked.']],
+    [8, ['Barely warmed up. The dancers are unimpressed.', 'Darsh has not even picked an outfit yet.']],
+    [16, ['Respectable. Your feet disagree.', 'Respectable. Aidan is asking Claude how to do better.']],
+    [24, ['Deep into the night shift. Somebody get this bot a snack.', 'Deep into the night shift. Half apps cannot come soon enough.']],
+    [36, ['Past halfway, powered entirely by vibes.', 'Past halfway. Officially cooked, still standing.']],
+    [46, ['So close. The finish line could taste it.', 'So close. Sasha is pretending not to be impressed.']],
+  ];
   function hourQuip(h) {
     if (h >= 46) return 'All 46 hours! You may now sit down. (You are a robot. You do not sit.)';
-    const q = h < 2 ? 'The opening ceremony lasted longer.' : h < 8 ? 'Barely warmed up. The dancers are unimpressed.'
-      : h < 16 ? 'Respectable. Your feet disagree.' : h < 24 ? 'Deep into the night shift. Somebody get this bot a snack.'
-      : h < 36 ? 'Past halfway, powered entirely by vibes.' : 'So close. The finish line could taste it.';
-    return 'You stayed standing for ' + h + ' of 46 hours. ' + q;
+    return 'You stayed standing for ' + h + ' of 46 hours. ' + pickOne(HOUR_QUIPS.find((q) => h < q[0])[1]);
   }
   const show = (node, on) => node.classList.toggle('hidden', !on);
   const fmt = (n) => Math.floor(n).toLocaleString('en-US');
@@ -121,7 +141,13 @@
     for (const s of art.SKINS) {
       const owned = d.owned.includes(s.id), equipped = d.skin === s.id;
       const card = document.createElement('div');
-      card.className = 'skin' + (equipped ? ' equipped' : '') + (owned ? '' : ' locked');
+      card.className = 'skin' + (equipped ? ' equipped' : '') + (owned ? '' : ' locked') + (s.tag === 'LEGENDARY' ? ' legendary' : '');
+      if (s.tag) {
+        const tag = document.createElement('i');
+        tag.className = 'tag';
+        tag.textContent = s.tag;
+        card.append(tag);
+      }
       const cv = document.createElement('canvas');
       cv.width = 192;
       cv.height = 240;
@@ -172,14 +198,16 @@
       g.setTransform(2, 0, 0, 2, 0, 0);
       g.clearRect(0, 0, 96, 120);
       const eq = cv.dataset.skin === save.data.skin;
+      const skin = art.skin(cv.dataset.skin);
+      const sc = skin.tall ? 0.98 : 1.08; // a tall character still has to fit the card
       g.fillStyle = 'rgba(0,0,0,0.35)';
       g.beginPath();
       g.ellipse(48, 116, 26, 4, 0, 0, Math.PI * 2);
       g.fill();
       art.drawRobot(g, {
-        x: 50, y: 72, scale: 1.08, phase: eq ? clock * 9 : 0.6, ground: 1, thrust: 0, vy: 0, t: clock,
+        x: 50, y: 115 - 40 * sc, scale: sc, phase: eq ? clock * 9 : 0.6, ground: 1, thrust: 0, vy: 0, t: clock,
         ant: Math.sin(clock * 3) * 2, blink: clock % 3.2 < 0.12,
-      }, art.skin(cv.dataset.skin));
+      }, skin);
     }
   }
 
