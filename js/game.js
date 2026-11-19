@@ -16,11 +16,22 @@
   const ZONE_M = 400; // the look of the arena changes every 8 hours
   const HOUR_M = 50; // metres flown per hour of the 46-hour marathon
   const QUIP = {
-    close: ['CLOSE CALL', 'NICE DODGE', 'TOO CLOSE', 'SMOOTH', 'DANCE MOVES', 'RULES & REGS SAW THAT'],
-    smash: ['SMASH', 'UNPLUGGED', 'TUB SMASH', 'RECYCLED'],
-    ride: ["RIDE'S OVER", 'THERE GOES THE DEPOSIT', 'THAT WAS A RENTAL', 'WALK IT OFF', 'WE NEEDED THAT'],
-    truck: ['ROAD CLOSED', 'RIGHT OF WAY', 'HONK HONK', 'NO BRAKES', 'OVERSIZE LOAD', 'THAT WILL BUFF OUT'],
-    hours: [null, "Line dance o'clock", 'The 3 AM slump. Stay standing.', 'Halfway! Nobody sit down.', 'Pep rally energy', 'The final stretch'],
+    close: ['CLOSE CALL', 'NICE DODGE', 'TOO CLOSE', 'SMOOTH', 'DANCE MOVES', 'RULES & REGS SAW THAT',
+      'CLAUDE SAW THAT', 'CLEAN LIKE DARSH', 'FIT CHECK PASSED', 'NOT COOKED YET', "DON'T TELL SASHA",
+      'LEGENDARY SKIN ENERGY', 'WARRIOR REFLEXES'],
+    smash: ['SMASH', 'UNPLUGGED', 'TUB SMASH', 'RECYCLED', 'SHIPPED IT', 'CLAUDE DID THAT', 'MERGED TO MAIN', 'HALF OFF',
+      'WARRIOR MODE', 'FINAL BOSS DEFEATED'],
+    ride: ["RIDE'S OVER", 'THERE GOES THE DEPOSIT', 'THAT WAS A RENTAL', 'WALK IT OFF', 'WE NEEDED THAT',
+      "WE'RE COOKED", 'BLAME SASHA', 'ASK CLAUDE FOR ANOTHER', 'BACK TO THE STARTER PACK'],
+    truck: ['ROAD CLOSED', 'RIGHT OF WAY', 'HONK HONK', 'NO BRAKES', 'OVERSIZE LOAD', 'THAT WILL BUFF OUT',
+      'HALF APPS OR BUST', 'SORRY SASHA', 'COMFORT SET CONVOY'],
+    // one list per 8-hour banner (hour 8, 16, 24, 32, 40)
+    hours: [null,
+      ["Line dance o'clock", 'Darsh is already on outfit number three'],
+      ['The 3 AM slump. Stay standing.', 'Michelle reports that she is cooked'],
+      ['Halfway! Nobody sit down.', 'Halfway. Aidan asked Claude to confirm.'],
+      ['Pep rally energy', 'Sasha did not sign off on this hour'],
+      ['The final stretch', 'Half apps are so close you can smell them']],
   };
   const FOOT = 40, HEAD = 64; // runner's reach below / above its centre at scale 1
   const ULTRA_SCALE = 1.95;
@@ -1191,7 +1202,7 @@
         art.getTheme(z);
         art.prewarm(z + 1);
         const th = art.THEMES[z % art.THEMES.length];
-        TR.ui.banner('HOUR ' + z * 8, QUIP.hours[z] || 'Overtime. Nobody told the robot to stop.', th.accent);
+        TR.ui.banner('HOUR ' + z * 8, QUIP.hours[z] ? pick(QUIP.hours[z]) : 'Overtime. Nobody told the robot to stop.', th.accent);
         A.play('zone');
       }
       if (!w.made46 && w.dist >= 46 * HOUR_M) {
